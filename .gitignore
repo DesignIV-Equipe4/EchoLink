@@ -1,43 +1,73 @@
-# For PCBs designed using KiCad: https://www.kicad.org/
-# Format documentation: https://kicad.org/help/file-formats/
+# === STM32CubeIDE ===
+**/.settings/
+**/.metadata/
+**/.externalToolBuilders/
+**/.vscode/
+**/.idea/
+**/*.launch
+**/*.log
+**/Debug/
+**/Release/
 
-# Temporary files
-*.000
-*.bak
-*.bck
-*.kicad_pcb-bak
-*.kicad_sch-bak
-*-backups
-*-cache*
-*-bak
-*-bak*
-*~
-~*
-_autosave-*
-\#auto_saved_files\#
-*.tmp
-*-save.pro
-*-save.kicad_pcb
-fp-info-cache
-~*.lck
-\#auto_saved_files#
+# === KiCad ===
+# Fichiers générés automatiquement
+**/*.bak
+**/*.kicad_prl
+**/*.kicad_sch-bak
+**/*.tmp
+**/*.net
+**/*.xml
+**/*.lck
 
-# Netlist files (exported from Eeschema)
-*.net
+# Sauvegardes automatiques KiCad
+**/*-backups/
+**/*-cache.lib
 
-# Autorouter files (exported from Pcbnew)
-*.dsn
-*.ses
+# === Fichiers temporaires ===
+**/Backup/*.bak
+**/*.swp
+**/*.swo
+**/*~
 
-# Exported BOM files
-*.xml
-*.csv
+# === Python ===
+# Bytecode / cache
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
 
-# Archived Backups (KiCad 6.0)
-**/*-backups/*.zip
+# Environnements virtuels
+**/.venv/
+**/venv/
+**/env/
+**/ENV/
 
-# Local git-based history (KiCad 9.0+)
-.history
+# Packaging / build
+**/build/
+**/dist/
+**/*.egg-info/
+**/.eggs/
 
-# Local project settings
-*.kicad_prl
+# Tests / coverage
+**/.pytest_cache/
+**/.coverage
+**/.coverage.*
+**/htmlcov/
+
+# Type checkers / linters
+**/.mypy_cache/
+**/.ruff_cache/
+**/.pyre/
+
+# Jupyter
+**/.ipynb_checkpoints/
+
+# Logs Python
+**/*.log
+
+# === Versions ===
+ODB_V1/
+ODB_V2/
+
+# === Branch ===
+Documentation/
+README.md
