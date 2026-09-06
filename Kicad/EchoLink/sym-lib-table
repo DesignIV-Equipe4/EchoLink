@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "EchoLink_lib") (type "KiCad") (uri "${KIPRJMOD}/echolink_lib.kicad_sym") (options "") (descr ""))
+)
