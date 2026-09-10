@@ -2756,7 +2756,7 @@
 		)
 		(uuid "aa74cefd-db4a-4037-a137-89a1d671df29")
 	)
-	(text "-Ajouter un circuit de controle d'alim bluetooth + pins\n-Ajuster EXTENDs\n-Déterminer taille du connecteur d'alim / signaux\n-Ajuster pins kicad / cubeide pour signaux alim connecteur\n-Ajouter des test points\n-Pas de routage d'alim sous le module LoRa\n-Nécessaire d'ajouter un coat\n-Ajouter TVS + polyfuse"
+	(text "-Peut-être ajouter un controle d'alim bluetooth + pins\n-Ajuster EXTENDs\n-Déterminer taille du connecteur d'alim / signaux\n-Ajuster pins kicad / cubeide pour signaux alim connecteur\n-Ajouter des test points\n-Pas de routage d'alim sous le module LoRa\n-Nécessaire d'ajouter un coat\n-Ajouter TVS + polyfuse"
 		(exclude_from_sim no)
 		(at 100.33 26.416 0)
 		(effects
