@@ -98,7 +98,7 @@ Chaque nœud, qu'il soit relais ou terminal, ne connaît physiquement que ses vo
 
   
 
-# 3. Trame Réseau, CRC8, ACKs, TTL et Timers
+# 3. Trame Réseau, CRC8, ACKs, TTL, Timers et Watchdog
 
   
 
