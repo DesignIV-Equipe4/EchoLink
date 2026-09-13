@@ -3732,7 +3732,8 @@
 		(effects
 			(font
 				(size 2.54 2.54)
-				(thickness 0.1875)
+				(thickness 0.508)
+				(bold yes)
 			)
 		)
 		(uuid "911161a3-e633-495f-9560-a4bf0082ba44")
