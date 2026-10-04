@@ -88,6 +88,72 @@ void HAL_MspInit(void)
 }
 
 /**
+  * @brief CAN MSP Initialization
+  * This function configures the hardware resources used in this example
+  * @param hcan: CAN handle pointer
+  * @retval None
+  */
+void HAL_CAN_MspInit(CAN_HandleTypeDef* hcan)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(hcan->Instance==CAN1)
+  {
+    /* USER CODE BEGIN CAN1_MspInit 0 */
+
+    /* USER CODE END CAN1_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_CAN1_CLK_ENABLE();
+
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    /**CAN1 GPIO Configuration
+    PB8     ------> CAN1_RX
+    PB9     ------> CAN1_TX
+    */
+    GPIO_InitStruct.Pin = ISO_CAN1_RXD_Pin|ISO_CAN1_TXD_Pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF9_CAN1;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    /* USER CODE BEGIN CAN1_MspInit 1 */
+
+    /* USER CODE END CAN1_MspInit 1 */
+
+  }
+
+}
+
+/**
+  * @brief CAN MSP De-Initialization
+  * This function freeze the hardware resources used in this example
+  * @param hcan: CAN handle pointer
+  * @retval None
+  */
+void HAL_CAN_MspDeInit(CAN_HandleTypeDef* hcan)
+{
+  if(hcan->Instance==CAN1)
+  {
+    /* USER CODE BEGIN CAN1_MspDeInit 0 */
+
+    /* USER CODE END CAN1_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_CAN1_CLK_DISABLE();
+
+    /**CAN1 GPIO Configuration
+    PB8     ------> CAN1_RX
+    PB9     ------> CAN1_TX
+    */
+    HAL_GPIO_DeInit(GPIOB, ISO_CAN1_RXD_Pin|ISO_CAN1_TXD_Pin);
+
+    /* USER CODE BEGIN CAN1_MspDeInit 1 */
+
+    /* USER CODE END CAN1_MspDeInit 1 */
+  }
+
+}
+
+/**
   * @brief LPTIM MSP Initialization
   * This function configures the hardware resources used in this example
   * @param hlptim: LPTIM handle pointer
@@ -95,40 +161,27 @@ void HAL_MspInit(void)
   */
 void HAL_LPTIM_MspInit(LPTIM_HandleTypeDef* hlptim)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
-  if(hlptim->Instance==LPTIM2)
+  if(hlptim->Instance==LPTIM1)
   {
-    /* USER CODE BEGIN LPTIM2_MspInit 0 */
+    /* USER CODE BEGIN LPTIM1_MspInit 0 */
 
-    /* USER CODE END LPTIM2_MspInit 0 */
+    /* USER CODE END LPTIM1_MspInit 0 */
 
   /** Initializes the peripherals clock
   */
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_LPTIM2;
-    PeriphClkInit.Lptim2ClockSelection = RCC_LPTIM2CLKSOURCE_LSI;
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_LPTIM1;
+    PeriphClkInit.Lptim1ClockSelection = RCC_LPTIM1CLKSOURCE_PCLK;
     if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
     {
       Error_Handler();
     }
 
     /* Peripheral clock enable */
-    __HAL_RCC_LPTIM2_CLK_ENABLE();
+    __HAL_RCC_LPTIM1_CLK_ENABLE();
+    /* USER CODE BEGIN LPTIM1_MspInit 1 */
 
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**LPTIM2 GPIO Configuration
-    PA8     ------> LPTIM2_OUT
-    */
-    GPIO_InitStruct.Pin = PWR_LPTIM2_OUT_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF14_LPTIM2;
-    HAL_GPIO_Init(PWR_LPTIM2_OUT_GPIO_Port, &GPIO_InitStruct);
-
-    /* USER CODE BEGIN LPTIM2_MspInit 1 */
-
-    /* USER CODE END LPTIM2_MspInit 1 */
+    /* USER CODE END LPTIM1_MspInit 1 */
 
   }
 
@@ -142,22 +195,16 @@ void HAL_LPTIM_MspInit(LPTIM_HandleTypeDef* hlptim)
   */
 void HAL_LPTIM_MspDeInit(LPTIM_HandleTypeDef* hlptim)
 {
-  if(hlptim->Instance==LPTIM2)
+  if(hlptim->Instance==LPTIM1)
   {
-    /* USER CODE BEGIN LPTIM2_MspDeInit 0 */
+    /* USER CODE BEGIN LPTIM1_MspDeInit 0 */
 
-    /* USER CODE END LPTIM2_MspDeInit 0 */
+    /* USER CODE END LPTIM1_MspDeInit 0 */
     /* Peripheral clock disable */
-    __HAL_RCC_LPTIM2_CLK_DISABLE();
+    __HAL_RCC_LPTIM1_CLK_DISABLE();
+    /* USER CODE BEGIN LPTIM1_MspDeInit 1 */
 
-    /**LPTIM2 GPIO Configuration
-    PA8     ------> LPTIM2_OUT
-    */
-    HAL_GPIO_DeInit(PWR_LPTIM2_OUT_GPIO_Port, PWR_LPTIM2_OUT_Pin);
-
-    /* USER CODE BEGIN LPTIM2_MspDeInit 1 */
-
-    /* USER CODE END LPTIM2_MspDeInit 1 */
+    /* USER CODE END LPTIM1_MspDeInit 1 */
   }
 
 }
@@ -194,10 +241,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     /**LPUART1 GPIO Configuration
     PB10     ------> LPUART1_RX
     PB11     ------> LPUART1_TX
-    PB12     ------> LPUART1_RTS
-    PB13     ------> LPUART1_CTS
     */
-    GPIO_InitStruct.Pin = BT_LPUART1_RX_Pin|BT_LPUART1_TX_Pin|BT_LPUART1_RTS_Pin|BT_LPUART1_CTS_Pin;
+    GPIO_InitStruct.Pin = BMS_LPUART1_RX_Pin|BMS_LPUART1_TX_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -231,7 +276,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     PB6     ------> USART1_TX
     PB7     ------> USART1_RX
     */
-    GPIO_InitStruct.Pin = RS232_UART1_TX_Pin|RS232_UART1_RX_Pin;
+    GPIO_InitStruct.Pin = BOOT_UART1_TX_Pin|BOOT_UART1_RX_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -264,10 +309,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     /**LPUART1 GPIO Configuration
     PB10     ------> LPUART1_RX
     PB11     ------> LPUART1_TX
-    PB12     ------> LPUART1_RTS
-    PB13     ------> LPUART1_CTS
     */
-    HAL_GPIO_DeInit(GPIOB, BT_LPUART1_RX_Pin|BT_LPUART1_TX_Pin|BT_LPUART1_RTS_Pin|BT_LPUART1_CTS_Pin);
+    HAL_GPIO_DeInit(GPIOB, BMS_LPUART1_RX_Pin|BMS_LPUART1_TX_Pin);
 
     /* USER CODE BEGIN LPUART1_MspDeInit 1 */
 
@@ -285,7 +328,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     PB6     ------> USART1_TX
     PB7     ------> USART1_RX
     */
-    HAL_GPIO_DeInit(GPIOB, RS232_UART1_TX_Pin|RS232_UART1_RX_Pin);
+    HAL_GPIO_DeInit(GPIOB, BOOT_UART1_TX_Pin|BOOT_UART1_RX_Pin);
 
     /* USER CODE BEGIN USART1_MspDeInit 1 */
 

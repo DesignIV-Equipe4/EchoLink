@@ -40,7 +40,9 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-LPTIM_HandleTypeDef hlptim2;
+CAN_HandleTypeDef hcan1;
+
+LPTIM_HandleTypeDef hlptim1;
 
 UART_HandleTypeDef hlpuart1;
 UART_HandleTypeDef huart1;
@@ -55,9 +57,10 @@ SPI_HandleTypeDef hspi1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_LPUART1_UART_Init(void);
-static void MX_USART1_UART_Init(void);
 static void MX_SPI1_Init(void);
-static void MX_LPTIM2_Init(void);
+static void MX_CAN1_Init(void);
+static void MX_LPTIM1_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -97,9 +100,10 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_LPUART1_UART_Init();
-  MX_USART1_UART_Init();
   MX_SPI1_Init();
-  MX_LPTIM2_Init();
+  MX_CAN1_Init();
+  MX_LPTIM1_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -134,8 +138,7 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
   RCC_OscInitStruct.MSIState = RCC_MSI_ON;
   RCC_OscInitStruct.MSICalibrationValue = 0;
   RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
@@ -161,36 +164,73 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief LPTIM2 Initialization Function
+  * @brief CAN1 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_LPTIM2_Init(void)
+static void MX_CAN1_Init(void)
 {
 
-  /* USER CODE BEGIN LPTIM2_Init 0 */
+  /* USER CODE BEGIN CAN1_Init 0 */
 
-  /* USER CODE END LPTIM2_Init 0 */
+  /* USER CODE END CAN1_Init 0 */
 
-  /* USER CODE BEGIN LPTIM2_Init 1 */
+  /* USER CODE BEGIN CAN1_Init 1 */
 
-  /* USER CODE END LPTIM2_Init 1 */
-  hlptim2.Instance = LPTIM2;
-  hlptim2.Init.Clock.Source = LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC;
-  hlptim2.Init.Clock.Prescaler = LPTIM_PRESCALER_DIV1;
-  hlptim2.Init.Trigger.Source = LPTIM_TRIGSOURCE_SOFTWARE;
-  hlptim2.Init.OutputPolarity = LPTIM_OUTPUTPOLARITY_HIGH;
-  hlptim2.Init.UpdateMode = LPTIM_UPDATE_IMMEDIATE;
-  hlptim2.Init.CounterSource = LPTIM_COUNTERSOURCE_INTERNAL;
-  hlptim2.Init.Input1Source = LPTIM_INPUT1SOURCE_GPIO;
-  hlptim2.Init.Input2Source = LPTIM_INPUT2SOURCE_GPIO;
-  if (HAL_LPTIM_Init(&hlptim2) != HAL_OK)
+  /* USER CODE END CAN1_Init 1 */
+  hcan1.Instance = CAN1;
+  hcan1.Init.Prescaler = 16;
+  hcan1.Init.Mode = CAN_MODE_NORMAL;
+  hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
+  hcan1.Init.TimeSeg1 = CAN_BS1_1TQ;
+  hcan1.Init.TimeSeg2 = CAN_BS2_1TQ;
+  hcan1.Init.TimeTriggeredMode = DISABLE;
+  hcan1.Init.AutoBusOff = DISABLE;
+  hcan1.Init.AutoWakeUp = DISABLE;
+  hcan1.Init.AutoRetransmission = DISABLE;
+  hcan1.Init.ReceiveFifoLocked = DISABLE;
+  hcan1.Init.TransmitFifoPriority = DISABLE;
+  if (HAL_CAN_Init(&hcan1) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN LPTIM2_Init 2 */
+  /* USER CODE BEGIN CAN1_Init 2 */
 
-  /* USER CODE END LPTIM2_Init 2 */
+  /* USER CODE END CAN1_Init 2 */
+
+}
+
+/**
+  * @brief LPTIM1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_LPTIM1_Init(void)
+{
+
+  /* USER CODE BEGIN LPTIM1_Init 0 */
+
+  /* USER CODE END LPTIM1_Init 0 */
+
+  /* USER CODE BEGIN LPTIM1_Init 1 */
+
+  /* USER CODE END LPTIM1_Init 1 */
+  hlptim1.Instance = LPTIM1;
+  hlptim1.Init.Clock.Source = LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC;
+  hlptim1.Init.Clock.Prescaler = LPTIM_PRESCALER_DIV1;
+  hlptim1.Init.Trigger.Source = LPTIM_TRIGSOURCE_SOFTWARE;
+  hlptim1.Init.OutputPolarity = LPTIM_OUTPUTPOLARITY_HIGH;
+  hlptim1.Init.UpdateMode = LPTIM_UPDATE_IMMEDIATE;
+  hlptim1.Init.CounterSource = LPTIM_COUNTERSOURCE_INTERNAL;
+  hlptim1.Init.Input1Source = LPTIM_INPUT1SOURCE_GPIO;
+  hlptim1.Init.Input2Source = LPTIM_INPUT2SOURCE_GPIO;
+  if (HAL_LPTIM_Init(&hlptim1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN LPTIM1_Init 2 */
+
+  /* USER CODE END LPTIM1_Init 2 */
 
 }
 
@@ -215,7 +255,7 @@ static void MX_LPUART1_UART_Init(void)
   hlpuart1.Init.StopBits = UART_STOPBITS_1;
   hlpuart1.Init.Parity = UART_PARITY_NONE;
   hlpuart1.Init.Mode = UART_MODE_TX_RX;
-  hlpuart1.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
+  hlpuart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   hlpuart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   hlpuart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
   if (HAL_UART_Init(&hlpuart1) != HAL_OK)
@@ -317,40 +357,82 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LORA_nRST_Pin|LORA_SPI1_NSS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, ISO_STB_Pin|ISO_FLT_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LORA_RXEN_Pin|BT_nSYSKEY_Pin|RS232_EN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LORA_nRST_Pin|LORA_SPI1_NSS_Pin|PWR_IO1_Pin|PWR_IO2_Pin
+                          |PWR_IO3_Pin|PWR_IO4_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LORA_nRST_Pin LORA_SPI1_NSS_Pin */
-  GPIO_InitStruct.Pin = LORA_nRST_Pin|LORA_SPI1_NSS_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LORA_RXEN_GPIO_Port, LORA_RXEN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : ISO_STB_Pin ISO_FLT_Pin */
+  GPIO_InitStruct.Pin = ISO_STB_Pin|ISO_FLT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : EXTEND_IO1_Pin */
+  GPIO_InitStruct.Pin = EXTEND_IO1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(EXTEND_IO1_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : EXTEND_IO2_Pin EXTEND_IO3_Pin */
+  GPIO_InitStruct.Pin = EXTEND_IO2_Pin|EXTEND_IO3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : MOD_OPT_Pin */
+  GPIO_InitStruct.Pin = MOD_OPT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(MOD_OPT_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LORA_nRST_Pin LORA_SPI1_NSS_Pin PWR_IO1_Pin PWR_IO2_Pin
+                           PWR_IO3_Pin PWR_IO4_Pin */
+  GPIO_InitStruct.Pin = LORA_nRST_Pin|LORA_SPI1_NSS_Pin|PWR_IO1_Pin|PWR_IO2_Pin
+                          |PWR_IO3_Pin|PWR_IO4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LORA_RXEN_Pin BT_nSYSKEY_Pin RS232_EN_Pin */
-  GPIO_InitStruct.Pin = LORA_RXEN_Pin|BT_nSYSKEY_Pin|RS232_EN_Pin;
+  /*Configure GPIO pin : LORA_RXEN_Pin */
+  GPIO_InitStruct.Pin = LORA_RXEN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+  HAL_GPIO_Init(LORA_RXEN_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LORA_BUSY_Pin MOD_0_Pin */
-  GPIO_InitStruct.Pin = LORA_BUSY_Pin|MOD_0_Pin;
+  /*Configure GPIO pins : LORA_BUSY_Pin EXTEND_IO4_Pin EXTEND_IO5_Pin EXTEND_IO6_Pin
+                           EXTEND_IO7_Pin EXTEND_IO8_Pin */
+  GPIO_InitStruct.Pin = LORA_BUSY_Pin|EXTEND_IO4_Pin|EXTEND_IO5_Pin|EXTEND_IO6_Pin
+                          |EXTEND_IO7_Pin|EXTEND_IO8_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : BT_IO2_Pin */
-  GPIO_InitStruct.Pin = BT_IO2_Pin;
+  /*Configure GPIO pin : PWR_SPEED_Pin */
+  GPIO_InitStruct.Pin = PWR_SPEED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(BT_IO2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(PWR_SPEED_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PWR_LPTIM2_OUT_Pin */
+  GPIO_InitStruct.Pin = PWR_LPTIM2_OUT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF14_LPTIM2;
+  HAL_GPIO_Init(PWR_LPTIM2_OUT_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
