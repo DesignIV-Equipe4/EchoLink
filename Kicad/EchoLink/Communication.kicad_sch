@@ -3849,6 +3849,10 @@
 		(at 186.69 74.93)
 		(uuid "a11dc084-345b-4717-a8c8-3b77c3af6bda")
 	)
+	(no_connect
+		(at 156.21 74.93)
+		(uuid "ae5be661-3550-4b9c-959d-44aec3ff85f1")
+	)
 	(wire
 		(pts
 			(xy 67.31 81.28) (xy 77.47 81.28)

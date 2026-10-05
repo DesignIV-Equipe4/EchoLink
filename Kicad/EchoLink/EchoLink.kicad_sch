@@ -4960,7 +4960,7 @@
 			)
 		)
 	)
-	(global_label "BOOT_UART1_TX"
+	(global_label "EXTEND_UART1_TX"
 		(shape input)
 		(at 151.13 110.49 0)
 		(effects
@@ -5658,7 +5658,7 @@
 			)
 		)
 	)
-	(global_label "BOOT_UART1_RX"
+	(global_label "EXTEND_UART1_RX"
 		(shape input)
 		(at 151.13 113.03 0)
 		(fields_autoplaced yes)
@@ -5671,7 +5671,7 @@
 		)
 		(uuid "85f0e727-61f3-4ad9-97f3-8bbbe95fcda7")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 169.2947 113.03 0)
+			(at 171.4717 113.03 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
