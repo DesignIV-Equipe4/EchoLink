@@ -1,0 +1,4 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "EchoLink_Lib") (type "KiCad") (uri "${KIPRJMOD}/EchoLink_Lib.pretty") (options "") (descr ""))
+)

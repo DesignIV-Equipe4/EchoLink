@@ -2933,7 +2933,7 @@
 		(uuid "12fdad76-a4d0-4b82-b982-6183eb0bc0c1")
 	)
 	(rectangle
-		(start 14.605 147.32)
+		(start 14.605 142.875)
 		(end 77.47 165.1)
 		(stroke
 			(width 0)
@@ -3120,9 +3120,9 @@
 		)
 		(uuid "b8e8383c-6d77-46a0-9f1c-0509bf5953c6")
 	)
-	(text "-Peut-être ajouter un controle d'alim bluetooth + pins\n-Ajuster EXTENDs\n-Connecteur entrant:\n	4x IOs relais (1x horn, 2x start engine, 1x start engine feedback)\n	1x Ethernet, retirer Bluetooth, retirer RS232\n-Pas de routage d'alim sous le module LoRa\n-Nécessaire d'ajouter un coat\n-Ajouter CAN\n-Possibilité de remplacer 3 entrées WKUP par 1 avec un OR 3-gates\n-Ajouter bouton hard reset\n-Ajouter connecteur différent UART BMS"
+	(text "-Pas de routage d'alim sous le module LoRa\n-Nécessaire d'ajouter un coat\n-Vérifier TVS"
 		(exclude_from_sim no)
-		(at 100.33 27.432 0)
+		(at 100.33 19.304 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3134,7 +3134,7 @@
 	)
 	(text "Test Points"
 		(exclude_from_sim no)
-		(at 26.162 150.368 0)
+		(at 26.162 146.05 0)
 		(effects
 			(font
 				(size 2.54 2.54)
@@ -3186,16 +3186,6 @@
 			(justify left top)
 		)
 		(uuid "ec90fb03-9e3b-4a7f-bda9-5e5d67c19fa7")
-	)
-	(text "2 cap ici doivent\nêtre en 0402 et X7R \npour réduire \niductance parasite"
-		(exclude_from_sim no)
-		(at 259.334 72.39 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "ecd23598-927f-43a6-b01d-b4b1fb7542a8")
 	)
 	(text "Mounting Holes"
 		(exclude_from_sim no)
@@ -3737,6 +3727,16 @@
 	)
 	(wire
 		(pts
+			(xy 54.61 152.4) (xy 55.88 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3668b296-ca1e-41ce-83b2-a30e4453273b")
+	)
+	(wire
+		(pts
 			(xy 140.97 81.28) (xy 140.97 76.2)
 		)
 		(stroke
@@ -3857,7 +3857,7 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 162.56) (xy 35.56 162.56)
+			(xy 34.29 157.48) (xy 35.56 157.48)
 		)
 		(stroke
 			(width 0)
@@ -3897,6 +3897,16 @@
 	)
 	(wire
 		(pts
+			(xy 54.61 154.94) (xy 55.88 154.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4a63cc22-cf2e-49de-abc1-f26074443a08")
+	)
+	(wire
+		(pts
 			(xy 252.73 132.08) (xy 252.73 133.35)
 		)
 		(stroke
@@ -3907,7 +3917,7 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 160.02) (xy 35.56 160.02)
+			(xy 34.29 154.94) (xy 35.56 154.94)
 		)
 		(stroke
 			(width 0)
@@ -3944,6 +3954,16 @@
 			(type default)
 		)
 		(uuid "57d7a26b-0204-41af-acb6-f3a814556ca6")
+	)
+	(wire
+		(pts
+			(xy 54.61 160.02) (xy 55.88 160.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "596bd2ef-de0a-434b-bece-0e1692be9c67")
 	)
 	(wire
 		(pts
@@ -4147,6 +4167,16 @@
 	)
 	(wire
 		(pts
+			(xy 35.56 160.02) (xy 34.29 160.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7fae59fc-ed02-497f-956c-407d0ea805e9")
+	)
+	(wire
+		(pts
 			(xy 269.24 93.98) (xy 269.24 95.25)
 		)
 		(stroke
@@ -4174,6 +4204,16 @@
 			(type default)
 		)
 		(uuid "88c7b53b-b3d6-40a7-b2a1-e45dbb2dc6b8")
+	)
+	(wire
+		(pts
+			(xy 54.61 157.48) (xy 55.88 157.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "890b8ecb-c59c-468b-8fc4-19cdde367fa8")
 	)
 	(wire
 		(pts
@@ -4527,6 +4567,16 @@
 	)
 	(wire
 		(pts
+			(xy 35.56 162.56) (xy 34.29 162.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ba9c9679-7156-4f5c-a31d-afc78cf8186e")
+	)
+	(wire
+		(pts
 			(xy 140.97 76.2) (xy 140.97 73.66)
 		)
 		(stroke
@@ -4607,13 +4657,23 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 157.48) (xy 35.56 157.48)
+			(xy 34.29 152.4) (xy 35.56 152.4)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "cdf854ec-cf40-4d89-a082-699210fa361c")
+	)
+	(wire
+		(pts
+			(xy 54.61 149.86) (xy 55.88 149.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cecf9239-951d-46e6-8a9c-e9b5ead3025d")
 	)
 	(wire
 		(pts
@@ -4667,7 +4727,7 @@
 	)
 	(wire
 		(pts
-			(xy 34.29 154.94) (xy 35.56 154.94)
+			(xy 34.29 149.86) (xy 35.56 149.86)
 		)
 		(stroke
 			(width 0)
@@ -4924,6 +4984,31 @@
 			)
 		)
 	)
+	(global_label "ISO_CAN1_TXD"
+		(shape input)
+		(at 34.29 162.56 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.1588)
+			)
+			(justify right)
+		)
+		(uuid "0ccc32c4-ddf0-41e0-b32e-2e340d1b5b7b")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 17.8791 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
 	(global_label "MOD_OPT"
 		(shape input)
 		(at 223.52 125.73 0)
@@ -4981,6 +5066,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
@@ -5025,17 +5111,18 @@
 	)
 	(global_label "LORA_SPI1_MISO"
 		(shape input)
-		(at 34.29 157.48 180)
+		(at 34.29 152.4 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
 		(uuid "2233c66c-60e4-46ce-bbbc-2bf788132898")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 15.7624 157.48 0)
+			(at 15.7624 152.4 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5054,6 +5141,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
@@ -5103,6 +5191,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
@@ -5152,6 +5241,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
@@ -5226,6 +5316,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify left)
 		)
@@ -5270,17 +5361,18 @@
 	)
 	(global_label "LORA_SPI1_SCK"
 		(shape input)
-		(at 34.29 154.94 180)
+		(at 34.29 149.86 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
 		(uuid "51e5228c-061f-4d40-a593-47df328a2226")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 16.6091 154.94 0)
+			(at 16.6091 149.86 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5299,6 +5391,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify left)
 		)
@@ -5398,6 +5491,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
@@ -5515,6 +5609,55 @@
 			)
 		)
 	)
+	(global_label "ISO_FNC"
+		(shape input)
+		(at 55.88 149.86 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.1588)
+			)
+			(justify left)
+		)
+		(uuid "7cfcc967-0ff1-4583-b35b-c8a9d3f400f9")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 66.6667 149.86 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+	)
+	(global_label "EXTEND_UART1_TX"
+		(shape input)
+		(at 55.88 157.48 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.1588)
+			)
+			(justify left)
+		)
+		(uuid "85dbdb77-28a1-4d23-9233-4c3336db8b1f")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 56.7182 154.94 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
 	(global_label "BOOT_UART1_RX"
 		(shape input)
 		(at 151.13 113.03 0)
@@ -5547,6 +5690,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify left)
 		)
@@ -5566,17 +5710,18 @@
 	)
 	(global_label "LORA_INT"
 		(shape input)
-		(at 34.29 162.56 180)
+		(at 34.29 157.48 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
 		(uuid "948d6b12-867e-40a1-b8d8-797b97f0e8e7")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 22.7171 162.56 0)
+			(at 22.7171 157.48 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5620,6 +5765,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
@@ -5634,6 +5780,56 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+			)
+		)
+	)
+	(global_label "ISO_CAN1_RXD"
+		(shape input)
+		(at 34.29 160.02 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.1588)
+			)
+			(justify right)
+		)
+		(uuid "9e56993d-961c-412f-9034-c4db5180e16f")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 17.5767 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(global_label "EXTEND_UART1_RX"
+		(shape input)
+		(at 55.88 160.02 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.1588)
+			)
+			(justify left)
+		)
+		(uuid "9eade630-02ca-4ce5-8b48-893f90a1ae44")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 76.2217 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
 		)
 	)
@@ -5719,6 +5915,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify left)
 		)
@@ -5786,19 +5983,20 @@
 			)
 		)
 	)
-	(global_label "ISO_FLT"
+	(global_label "ISO_FNC"
 		(shape input)
 		(at 92.71 86.36 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
 		(uuid "d54206bd-e6d9-4923-89c4-245e84726947")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 82.5281 86.36 0)
+			(at 81.9233 86.36 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5812,17 +6010,18 @@
 	)
 	(global_label "LORA_SPI1_MOSI"
 		(shape input)
-		(at 34.29 160.02 180)
+		(at 34.29 154.94 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify right)
 		)
 		(uuid "dce3edec-53da-408b-b850-a1d5048d0291")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 15.7624 160.02 0)
+			(at 15.7624 154.94 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5831,6 +6030,31 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+			)
+		)
+	)
+	(global_label "BMS_LPUART1_TX"
+		(shape input)
+		(at 55.88 152.4 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.1588)
+			)
+			(justify left)
+		)
+		(uuid "e0a2ae89-83f8-434f-9206-cd7fc9ec7b5b")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 75.0727 152.4 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
 		)
 	)
@@ -5891,6 +6115,7 @@
 		(effects
 			(font
 				(size 1.27 1.27)
+				(thickness 0.1588)
 			)
 			(justify left)
 		)
@@ -5930,6 +6155,31 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+			)
+		)
+	)
+	(global_label "BMS_LPUART1_RX"
+		(shape input)
+		(at 55.88 154.94 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.1588)
+			)
+			(justify left)
+		)
+		(uuid "f1cf57dc-19ed-4575-b655-03ceb510078e")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 75.3751 154.94 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
 		)
 	)
@@ -5984,7 +6234,7 @@
 	)
 	(symbol
 		(lib_id "Connector:TestPoint")
-		(at 35.56 154.94 270)
+		(at 35.56 149.86 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5995,7 +6245,7 @@
 		(fields_autoplaced yes)
 		(uuid "0471cdcf-48df-4b14-a3d9-c33571da40e3")
 		(property "Reference" "TP1"
-			(at 40.64 154.9399 90)
+			(at 40.64 149.8599 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6006,7 +6256,7 @@
 			)
 		)
 		(property "Value" "TestPoint"
-			(at 37.5921 157.48 0)
+			(at 37.5921 152.4 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6018,7 +6268,7 @@
 			)
 		)
 		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
-			(at 35.56 160.02 0)
+			(at 35.56 154.94 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6029,7 +6279,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 35.56 160.02 0)
+			(at 35.56 154.94 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6040,7 +6290,7 @@
 			)
 		)
 		(property "Description" "test point"
-			(at 35.56 154.94 0)
+			(at 35.56 149.86 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6073,7 +6323,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "0c973812-c3c1-44a5-a69e-ba4c72a4acae")
-		(property "Reference" "C10"
+		(property "Reference" "C9"
 			(at 250.698 62.484 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6203,7 +6453,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C10")
+					(reference "C9")
 					(unit 1)
 				)
 			)
@@ -6240,7 +6490,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 251.46 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -6368,7 +6618,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "131fc20d-008e-4a8a-ac6d-9310e01044a0")
-		(property "Reference" "#PWR010"
+		(property "Reference" "#PWR022"
 			(at 278.13 113.03 0)
 			(hide yes)
 			(show_name no)
@@ -6429,7 +6679,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR010")
+					(reference "#PWR022")
 					(unit 1)
 				)
 			)
@@ -6523,7 +6773,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "17ea2100-8251-43a2-9787-07f2eed0605d")
-		(property "Reference" "R5"
+		(property "Reference" "R4"
 			(at 216.154 123.444 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6653,7 +6903,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "R5")
+					(reference "R4")
 					(unit 1)
 				)
 			)
@@ -6670,7 +6920,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "1f16d14e-6e38-4411-a448-9c5368f7d014")
-		(property "Reference" "R11"
+		(property "Reference" "R6"
 			(at 254.254 127 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6800,7 +7050,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "R11")
+					(reference "R6")
 					(unit 1)
 				)
 			)
@@ -6817,7 +7067,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "1f65cb91-db6b-4e95-80c2-b6896920abe8")
-		(property "Reference" "#PWR026"
+		(property "Reference" "#PWR014"
 			(at 252.73 127 0)
 			(hide yes)
 			(show_name no)
@@ -6877,7 +7127,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR026")
+					(reference "#PWR014")
 					(unit 1)
 				)
 			)
@@ -6885,7 +7135,7 @@
 	)
 	(symbol
 		(lib_id "Connector:TestPoint")
-		(at 35.56 162.56 270)
+		(at 35.56 160.02 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -6894,9 +7144,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "2e876104-bd29-41e0-8e63-fe1ec072e32a")
-		(property "Reference" "TP4"
-			(at 40.64 162.5599 90)
+		(uuid "2cd5a120-beaa-4365-8df4-bafd45a5a6b4")
+		(property "Reference" "TP5"
+			(at 40.64 160.0199 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6907,7 +7157,7 @@
 			)
 		)
 		(property "Value" "TestPoint"
-			(at 37.5921 165.1 0)
+			(at 37.5921 162.56 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6919,7 +7169,7 @@
 			)
 		)
 		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
-			(at 35.56 167.64 0)
+			(at 35.56 165.1 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6930,7 +7180,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 35.56 167.64 0)
+			(at 35.56 165.1 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6941,7 +7191,87 @@
 			)
 		)
 		(property "Description" "test point"
+			(at 35.56 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "08c2fa0e-453e-418a-97bc-f4f913c94948")
+		)
+		(instances
+			(project "EchoLink"
+				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
+					(reference "TP5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 35.56 157.48 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2e876104-bd29-41e0-8e63-fe1ec072e32a")
+		(property "Reference" "TP4"
+			(at 40.64 157.4799 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 37.5921 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 35.56 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 35.56 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 35.56 157.48 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6975,7 +7305,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "385c91c9-b8da-4ffc-a580-d75d606148f4")
-		(property "Reference" "#PWR012"
+		(property "Reference" "#PWR013"
 			(at 250.19 77.47 0)
 			(hide yes)
 			(show_name no)
@@ -7036,7 +7366,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR012")
+					(reference "#PWR013")
 					(unit 1)
 				)
 			)
@@ -7075,7 +7405,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
 			(at 252.73 137.16 0)
 			(hide yes)
 			(show_name no)
@@ -7214,7 +7544,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3e692d3f-5671-496c-b368-8cfc3cb3c503")
-		(property "Reference" "#PWR015"
+		(property "Reference" "#PWR020"
 			(at 267.97 77.47 0)
 			(hide yes)
 			(show_name no)
@@ -7275,7 +7605,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR015")
+					(reference "#PWR020")
 					(unit 1)
 				)
 			)
@@ -7371,7 +7701,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "46e05a9a-0a65-4608-bf88-34e0b9a51e6c")
-		(property "Reference" "#PWR07"
+		(property "Reference" "#PWR09"
 			(at 234.95 62.23 0)
 			(hide yes)
 			(show_name no)
@@ -7431,7 +7761,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR07")
+					(reference "#PWR09")
 					(unit 1)
 				)
 			)
@@ -7448,7 +7778,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "49e84d65-f89a-419e-bc58-ba26262a2041")
-		(property "Reference" "R7"
+		(property "Reference" "R5"
 			(at 222.504 130.81 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7578,7 +7908,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "R7")
+					(reference "R5")
 					(unit 1)
 				)
 			)
@@ -7674,7 +8004,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "51178b0a-c182-41a6-9ab9-33c0afa1bdde")
-		(property "Reference" "#PWR014"
+		(property "Reference" "#PWR019"
 			(at 267.97 62.23 0)
 			(hide yes)
 			(show_name no)
@@ -7734,7 +8064,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR014")
+					(reference "#PWR019")
 					(unit 1)
 				)
 			)
@@ -7752,7 +8082,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "52e91b3b-0d3f-475f-a713-8776217ec2b0")
-		(property "Reference" "#PWR09"
+		(property "Reference" "#PWR011"
 			(at 243.84 30.48 0)
 			(hide yes)
 			(show_name no)
@@ -7812,7 +8142,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR09")
+					(reference "#PWR011")
 					(unit 1)
 				)
 			)
@@ -7830,7 +8160,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "56c36d14-c5ce-4817-af79-77895efa0f24")
-		(property "Reference" "#PWR013"
+		(property "Reference" "#PWR018"
 			(at 266.7 45.72 0)
 			(hide yes)
 			(show_name no)
@@ -7891,7 +8221,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR013")
+					(reference "#PWR018")
 					(unit 1)
 				)
 			)
@@ -7908,7 +8238,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "59b10d9d-d1fc-428c-9f66-85cac7a3bd90")
-		(property "Reference" "#PWR08"
+		(property "Reference" "#PWR021"
 			(at 269.24 97.79 0)
 			(hide yes)
 			(show_name no)
@@ -7968,7 +8298,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR08")
+					(reference "#PWR021")
 					(unit 1)
 				)
 			)
@@ -7985,7 +8315,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "59ff71f7-4790-423e-826e-f1c99fbd33fe")
-		(property "Reference" "C9"
+		(property "Reference" "C15"
 			(at 273.812 98.044 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8115,7 +8445,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C9")
+					(reference "C15")
 					(unit 1)
 				)
 			)
@@ -8132,7 +8462,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "5e737032-3a80-4994-851b-78a31edd85fe")
-		(property "Reference" "C5"
+		(property "Reference" "C7"
 			(at 235.458 62.484 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8262,7 +8592,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C5")
+					(reference "C7")
 					(unit 1)
 				)
 			)
@@ -8279,7 +8609,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "663fdeec-afc4-4519-83c6-e60ca0d6ce87")
-		(property "Reference" "C6"
+		(property "Reference" "C5"
 			(at 215.392 98.044 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8409,7 +8739,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C6")
+					(reference "C5")
 					(unit 1)
 				)
 			)
@@ -8427,7 +8757,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "66afc481-758f-448b-997e-80e60e6d7215")
-		(property "Reference" "#PWR016"
+		(property "Reference" "#PWR08"
 			(at 220.98 143.51 0)
 			(hide yes)
 			(show_name no)
@@ -8488,7 +8818,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR016")
+					(reference "#PWR08")
 					(unit 1)
 				)
 			)
@@ -8506,7 +8836,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "689c2da0-1ef6-4ba9-82bd-f02ba90cdff8")
-		(property "Reference" "#PWR028"
+		(property "Reference" "#PWR015"
 			(at 252.73 147.32 0)
 			(hide yes)
 			(show_name no)
@@ -8567,7 +8897,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR028")
+					(reference "#PWR015")
 					(unit 1)
 				)
 			)
@@ -8722,7 +9052,8 @@
 	)
 	(symbol
 		(lib_id "Connector:TestPoint")
-		(at 35.56 160.02 270)
+		(at 54.61 149.86 90)
+		(mirror x)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -8731,9 +9062,9 @@
 		(in_pos_files yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "6d57d8c3-7a92-46c4-b809-ba23fdf8928c")
-		(property "Reference" "TP3"
-			(at 40.64 160.0199 90)
+		(uuid "6d11d4dc-6bd7-422f-a369-8a57d0aefd1e")
+		(property "Reference" "TP7"
+			(at 49.53 149.8599 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -8744,7 +9075,7 @@
 			)
 		)
 		(property "Value" "TestPoint"
-			(at 37.5921 162.56 0)
+			(at 52.5779 152.4 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8756,7 +9087,7 @@
 			)
 		)
 		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
-			(at 35.56 165.1 0)
+			(at 54.61 154.94 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8767,7 +9098,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 35.56 165.1 0)
+			(at 54.61 154.94 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8778,7 +9109,87 @@
 			)
 		)
 		(property "Description" "test point"
+			(at 54.61 149.86 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "691b3f32-77f4-4219-9a1b-d9c873a9db7d")
+		)
+		(instances
+			(project "EchoLink"
+				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
+					(reference "TP7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 35.56 154.94 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "6d57d8c3-7a92-46c4-b809-ba23fdf8928c")
+		(property "Reference" "TP3"
+			(at 40.64 154.9399 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 37.5921 157.48 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
 			(at 35.56 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 35.56 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 35.56 154.94 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8811,7 +9222,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "6eca0662-87af-49bd-bf3d-03c80ff4641f")
-		(property "Reference" "SW2"
+		(property "Reference" "SW1"
 			(at 246.38 126.746 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8831,7 +9242,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+		(property "Footprint" "EchoLink_Lib:SON4_PTS526 SM15 SMTR2 LFS_CNK"
 			(at 246.38 128.27 0)
 			(hide yes)
 			(show_name no)
@@ -8842,7 +9253,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/c-k/PTS526SM15SMTR2-LFS/10056625"
 			(at 246.38 128.27 0)
 			(hide yes)
 			(show_name no)
@@ -8873,7 +9284,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "SW2")
+					(reference "SW1")
 					(unit 1)
 				)
 			)
@@ -8890,7 +9301,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "6f0b1629-4ed5-4bd1-94ae-9a6876203566")
-		(property "Reference" "JP2"
+		(property "Reference" "JP1"
 			(at 204.47 123.19 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8952,7 +9363,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "JP2")
+					(reference "JP1")
 					(unit 1)
 				)
 			)
@@ -9045,7 +9456,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "7468a00b-2f73-4adc-8278-d38ee1a10187")
-		(property "Reference" "C11"
+		(property "Reference" "C8"
 			(at 235.712 98.044 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9175,7 +9586,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C11")
+					(reference "C8")
 					(unit 1)
 				)
 			)
@@ -9268,7 +9679,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "78aa344e-87b1-4e41-9256-22b2a5926d9b")
-		(property "Reference" "R12"
+		(property "Reference" "R8"
 			(at 261.874 131.064 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9398,7 +9809,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "R12")
+					(reference "R8")
 					(unit 1)
 				)
 			)
@@ -9563,7 +9974,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "8045c6f5-1f96-4549-b626-a9529f878be4")
-		(property "Reference" "#PWR011"
+		(property "Reference" "#PWR07"
 			(at 198.12 128.27 0)
 			(hide yes)
 			(show_name no)
@@ -9623,7 +10034,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR011")
+					(reference "#PWR07")
 					(unit 1)
 				)
 			)
@@ -9640,7 +10051,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "81abc630-4674-42dd-bb09-9798aa0a0c32")
-		(property "Reference" "C18"
+		(property "Reference" "C12"
 			(at 266.192 136.144 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9770,7 +10181,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C18")
+					(reference "C12")
 					(unit 1)
 				)
 			)
@@ -9934,7 +10345,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "82ba7c35-9d27-4eef-bab2-ef83c4663453")
-		(property "Reference" "C8"
+		(property "Reference" "C6"
 			(at 225.552 98.044 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10064,7 +10475,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C8")
+					(reference "C6")
 					(unit 1)
 				)
 			)
@@ -10102,7 +10513,7 @@
 				)
 			)
 		)
-		(property "Footprint" "STM32L433CCT6:QFP50P900X900X160-48N"
+		(property "Footprint" "EchoLink_Lib:QFP50P900X900X160-48N"
 			(at 116.84 115.57 0)
 			(hide yes)
 			(show_name no)
@@ -10421,7 +10832,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "86066f86-1ad3-40c5-8e15-7bd958035959")
-		(property "Reference" "C7"
+		(property "Reference" "C14"
 			(at 264.922 98.044 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10551,7 +10962,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C7")
+					(reference "C14")
 					(unit 1)
 				)
 			)
@@ -10635,7 +11046,7 @@
 	)
 	(symbol
 		(lib_id "Connector:TestPoint")
-		(at 35.56 157.48 270)
+		(at 35.56 152.4 270)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -10646,7 +11057,7 @@
 		(fields_autoplaced yes)
 		(uuid "95dfa228-3df3-4a1c-8ff1-b1a266a73a38")
 		(property "Reference" "TP2"
-			(at 40.64 157.4799 90)
+			(at 40.64 152.3999 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -10657,7 +11068,7 @@
 			)
 		)
 		(property "Value" "TestPoint"
-			(at 37.5921 160.02 0)
+			(at 37.5921 154.94 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10669,7 +11080,7 @@
 			)
 		)
 		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
-			(at 35.56 162.56 0)
+			(at 35.56 157.48 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10680,7 +11091,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 35.56 162.56 0)
+			(at 35.56 157.48 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10691,7 +11102,7 @@
 			)
 		)
 		(property "Description" "test point"
-			(at 35.56 157.48 0)
+			(at 35.56 152.4 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -10870,7 +11281,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "9fd3e761-7b38-470d-8593-a4568ea1a2d3")
-		(property "Reference" "#PWR027"
+		(property "Reference" "#PWR017"
 			(at 265.43 149.86 0)
 			(hide yes)
 			(show_name no)
@@ -10931,7 +11342,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR027")
+					(reference "#PWR017")
 					(unit 1)
 				)
 			)
@@ -11093,7 +11504,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "ac5653f2-a0b2-41d5-9223-df163ed34c96")
-		(property "Reference" "R4"
+		(property "Reference" "R7"
 			(at 261.874 25.654 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11223,7 +11634,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "R4")
+					(reference "R7")
 					(unit 1)
 				)
 			)
@@ -11240,7 +11651,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "b06131c4-55a8-4b1c-b002-d57806266519")
-		(property "Reference" "JP1"
+		(property "Reference" "JP2"
 			(at 250.19 25.4 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11302,7 +11713,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "JP1")
+					(reference "JP2")
 					(unit 1)
 				)
 			)
@@ -11454,6 +11865,87 @@
 		)
 	)
 	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 54.61 160.02 90)
+		(mirror x)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b3725222-665d-43ca-ac21-1390926024cf")
+		(property "Reference" "TP11"
+			(at 49.53 160.0199 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 52.5779 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 54.61 165.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 54.61 165.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 54.61 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "764334d1-c877-44e0-8447-a0c25618316d")
+		)
+		(instances
+			(project "EchoLink"
+				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
+					(reference "TP11")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:GND")
 		(at 260.35 106.68 0)
 		(unit 1)
@@ -11465,7 +11957,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "b5a1ab26-124c-4ca9-aac3-85274e7407bb")
-		(property "Reference" "#PWR017"
+		(property "Reference" "#PWR016"
 			(at 260.35 113.03 0)
 			(hide yes)
 			(show_name no)
@@ -11526,7 +12018,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR017")
+					(reference "#PWR016")
 					(unit 1)
 				)
 			)
@@ -11543,7 +12035,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "b6ad84ab-19cb-486f-ba3f-34ccfe73edb3")
-		(property "Reference" "R6"
+		(property "Reference" "R9"
 			(at 268.224 33.02 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11673,7 +12165,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "R6")
+					(reference "R9")
 					(unit 1)
 				)
 			)
@@ -11690,7 +12182,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "b93c6b30-8578-4779-83f5-d12d0ed109a2")
-		(property "Reference" "C12"
+		(property "Reference" "C10"
 			(at 245.872 98.044 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -11820,7 +12312,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C12")
+					(reference "C10")
 					(unit 1)
 				)
 			)
@@ -11838,7 +12330,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "bf193d4e-5ac8-45ce-94fd-42dd3d0d31f9")
-		(property "Reference" "#PWR024"
+		(property "Reference" "#PWR012"
 			(at 248.92 166.37 0)
 			(hide yes)
 			(show_name no)
@@ -11899,7 +12391,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR024")
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)
@@ -12064,7 +12556,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c9322442-57d2-4fcb-9399-8ddd8ea00448")
-		(property "Reference" "#PWR025"
+		(property "Reference" "#PWR010"
 			(at 240.03 147.32 0)
 			(hide yes)
 			(show_name no)
@@ -12125,7 +12617,88 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "#PWR025")
+					(reference "#PWR010")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 54.61 152.4 90)
+		(mirror x)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "cad53c6c-3cec-42a2-a6b0-093467a6d462")
+		(property "Reference" "TP8"
+			(at 49.53 152.3999 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 52.5779 154.94 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 54.61 157.48 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 54.61 157.48 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 54.61 152.4 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "bc2b633c-8697-4f86-8765-8b53f10deb0b")
+		)
+		(instances
+			(project "EchoLink"
+				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
+					(reference "TP8")
 					(unit 1)
 				)
 			)
@@ -12221,7 +12794,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "cee76203-0cb0-416e-837a-95f684df23e4")
-		(property "Reference" "SW1"
+		(property "Reference" "SW2"
 			(at 252.476 156.21 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12241,7 +12814,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm"
+		(property "Footprint" "EchoLink_Lib:SON4_PTS526 SM15 SMTR2 LFS_CNK"
 			(at 255.27 153.67 0)
 			(hide yes)
 			(show_name no)
@@ -12252,7 +12825,7 @@
 				)
 			)
 		)
-		(property "Datasheet" ""
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/c-k/PTS526SM15SMTR2-LFS/10056625"
 			(at 255.27 153.67 0)
 			(hide yes)
 			(show_name no)
@@ -12283,7 +12856,168 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "SW1")
+					(reference "SW2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 54.61 157.48 90)
+		(mirror x)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d8f25914-5602-4b8e-bfe3-498fe2b717da")
+		(property "Reference" "TP10"
+			(at 49.53 157.4799 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 52.5779 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 54.61 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 54.61 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 54.61 157.48 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ad9b3bd7-95a5-4617-a6d1-7b31dd216420")
+		)
+		(instances
+			(project "EchoLink"
+				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
+					(reference "TP10")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 35.56 162.56 270)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "df0fef4c-a837-47eb-8156-8e5e24c1aef1")
+		(property "Reference" "TP6"
+			(at 40.64 162.5599 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 37.5921 165.1 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 35.56 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 35.56 167.64 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 35.56 162.56 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "ed0e5092-0f2c-45d5-9690-f8bb5ee63f30")
+		)
+		(instances
+			(project "EchoLink"
+				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
+					(reference "TP6")
 					(unit 1)
 				)
 			)
@@ -12378,7 +13112,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "e482a905-ba8c-453d-a12c-c57af8c2626e")
-		(property "Reference" "C14"
+		(property "Reference" "C11"
 			(at 256.032 98.044 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -12508,7 +13242,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
-					(reference "C14")
+					(reference "C11")
 					(unit 1)
 				)
 			)
@@ -12656,6 +13390,87 @@
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
 					(reference "C1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Connector:TestPoint")
+		(at 54.61 154.94 90)
+		(mirror x)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ea24d936-3884-4664-97e7-1444087eda3f")
+		(property "Reference" "TP9"
+			(at 49.53 154.9399 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "TestPoint"
+			(at 52.5779 157.48 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "TestPoint:TestPoint_Pad_D1.0mm"
+			(at 54.61 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 54.61 160.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "test point"
+			(at 54.61 154.94 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "464e066d-bf8c-49aa-81f2-08a58720933e")
+		)
+		(instances
+			(project "EchoLink"
+				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec"
+					(reference "TP9")
 					(unit 1)
 				)
 			)

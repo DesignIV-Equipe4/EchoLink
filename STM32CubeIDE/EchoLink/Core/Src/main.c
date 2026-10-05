@@ -362,7 +362,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, ISO_STB_Pin|ISO_FLT_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(ISO_STB_GPIO_Port, ISO_STB_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LORA_nRST_Pin|LORA_SPI1_NSS_Pin|PWR_IO1_Pin|PWR_IO2_Pin
@@ -371,18 +371,18 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LORA_RXEN_GPIO_Port, LORA_RXEN_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : ISO_STB_Pin ISO_FLT_Pin */
-  GPIO_InitStruct.Pin = ISO_STB_Pin|ISO_FLT_Pin;
+  /*Configure GPIO pin : ISO_STB_Pin */
+  GPIO_InitStruct.Pin = ISO_STB_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  HAL_GPIO_Init(ISO_STB_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : EXTEND_IO1_Pin */
-  GPIO_InitStruct.Pin = EXTEND_IO1_Pin;
+  /*Configure GPIO pins : ISO_FNC_Pin EXTEND_IO1_Pin */
+  GPIO_InitStruct.Pin = ISO_FNC_Pin|EXTEND_IO1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(EXTEND_IO1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : EXTEND_IO2_Pin EXTEND_IO3_Pin */
   GPIO_InitStruct.Pin = EXTEND_IO2_Pin|EXTEND_IO3_Pin;
