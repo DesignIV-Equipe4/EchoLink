@@ -1,0 +1,77 @@
+
+(kicad_symbol_lib (version 20211014) (generator kicad_symbol_editor)
+  (symbol "WE-XTAL_HC49" (pin_names (offset 1.016)) (in_bom yes) (on_board yes)
+    (property "Reference" "Y" (id 0) (at -0.16 2.516 0)
+      (effects (font (size 1.27 1.27)) (justify bottom))
+    )
+    (property "Value" "WE-XTAL_HC49" (id 1) (at -2.66 -3.04 0)
+      (effects (font (size 1.27 1.27)) (justify bottom left))
+    )
+    (property "Footprint" "WE-XTAL_HC49:WE-XTAL_HC49" (id 2) (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (justify bottom) hide)
+    )
+    (property "DigiKey_Part_Number" "1923-830050510CT-ND" (id 4) (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (justify bottom) hide)
+    )
+    (property "SnapEDA_Link" "https://www.snapeda.com/parts/830050510/W%25C3%25BCrth+Elektronik+Midcom/view-part/?ref=snap" (id 5) (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (justify bottom) hide)
+    )
+    (property "Description" "\n                        \n                            8 MHz ±30ppm Crystal 18pF 40 Ohms HC-49/US\n                        \n" (id 6) (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (justify bottom) hide)
+    )
+    (property "MF" "Würth Elektronik" (id 7) (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (justify bottom) hide)
+    )
+    (property "Package" "None" (id 8) (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (justify bottom) hide)
+    )
+    (property "Check_prices" "https://www.snapeda.com/parts/830050510/W%25C3%25BCrth+Elektronik+Midcom/view-part/?ref=eda" (id 9) (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (justify bottom) hide)
+    )
+    (property "MP" "830050510" (id 10) (at 0 0 0)
+      (effects (font (size 1.27 1.27)) (justify bottom) hide)
+    )
+    (symbol "WE-XTAL_HC49_0_0"
+      (polyline
+        (pts (xy 1.016 0.0) (xy 2.54 0.0)) (stroke (width 0.1524))
+      )
+      (polyline
+        (pts (xy -2.54 0.0) (xy -1.016 0.0)) (stroke (width 0.1524))
+      )
+      (polyline
+        (pts (xy -0.381 1.524) (xy -0.381 -1.524)) (stroke (width 0.254))
+      )
+      (polyline
+        (pts (xy -0.381 -1.524) (xy 0.381 -1.524)) (stroke (width 0.254))
+      )
+      (polyline
+        (pts (xy 0.381 -1.524) (xy 0.381 1.524)) (stroke (width 0.254))
+      )
+      (polyline
+        (pts (xy 0.381 1.524) (xy -0.381 1.524)) (stroke (width 0.254))
+      )
+      (polyline
+        (pts (xy 1.016 1.378) (xy 1.016 -1.378)) (stroke (width 0.254))
+      )
+      (polyline
+        (pts (xy -1.016 1.378) (xy -1.016 -1.378)) (stroke (width 0.254))
+      )
+      (pin passive line (at 2.54 0.0 180.0) (length 0)
+        (name "~"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "2"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+      (pin passive line (at -2.54 0.0 0) (length 0)
+        (name "~"
+          (effects (font (size 1.016 1.016)))
+        )
+        (number "1"
+          (effects (font (size 1.016 1.016)))
+        )
+      )
+    )
+  )
+)

@@ -61,12 +61,10 @@ void Error_Handler(void);
 #define ISO_STB_GPIO_Port GPIOC
 #define ISO_FNC_Pin GPIO_PIN_14
 #define ISO_FNC_GPIO_Port GPIOC
-#define EXTEND_IO1_Pin GPIO_PIN_15
-#define EXTEND_IO1_GPIO_Port GPIOC
-#define EXTEND_IO2_Pin GPIO_PIN_0
-#define EXTEND_IO2_GPIO_Port GPIOH
-#define EXTEND_IO3_Pin GPIO_PIN_1
-#define EXTEND_IO3_GPIO_Port GPIOH
+#define OSC_IN_Pin GPIO_PIN_0
+#define OSC_IN_GPIO_Port GPIOH
+#define OSC_OUT_Pin GPIO_PIN_1
+#define OSC_OUT_GPIO_Port GPIOH
 #define SYS_FNC_Pin GPIO_PIN_0
 #define SYS_FNC_GPIO_Port GPIOA
 #define MOD_OPT_Pin GPIO_PIN_1

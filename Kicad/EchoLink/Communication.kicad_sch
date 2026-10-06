@@ -5696,7 +5696,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "06ddab0c-8f85-4a75-8028-2ec331e3097a")
-		(property "Reference" "R10"
+		(property "Reference" "R11"
 			(at 38.862 48.514 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5824,7 +5824,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "R10")
+					(reference "R11")
 					(unit 1)
 				)
 			)
@@ -5841,7 +5841,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "0a0338be-7de7-46ac-aee3-7bdd69fef1a1")
-		(property "Reference" "R13"
+		(property "Reference" "R14"
 			(at 149.098 84.836 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5971,7 +5971,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "R13")
+					(reference "R14")
 					(unit 1)
 				)
 			)
@@ -5989,7 +5989,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "0c0c6649-adc8-4445-9917-cd86ab26331c")
-		(property "Reference" "#PWR034"
+		(property "Reference" "#PWR036"
 			(at 171.45 58.42 0)
 			(hide yes)
 			(show_name no)
@@ -6049,7 +6049,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR034")
+					(reference "#PWR036")
 					(unit 1)
 				)
 			)
@@ -6067,7 +6067,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "16080491-c4cd-4d01-a0fd-2ee57e37941f")
-		(property "Reference" "C16"
+		(property "Reference" "C18"
 			(at 29.972 76.454 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6197,7 +6197,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C16")
+					(reference "C18")
 					(unit 1)
 				)
 			)
@@ -6214,7 +6214,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "29f6deb5-1572-4ff0-8f21-e0fb4829b2ae")
-		(property "Reference" "R15"
+		(property "Reference" "R16"
 			(at 211.074 69.85 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6299,7 +6299,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "R15")
+					(reference "R16")
 					(unit 1)
 				)
 			)
@@ -6318,7 +6318,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "2d841633-959f-4199-b377-f2d1a75bebab")
-		(property "Reference" "#PWR028"
+		(property "Reference" "#PWR030"
 			(at 97.79 87.63 0)
 			(hide yes)
 			(show_name no)
@@ -6379,7 +6379,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR028")
+					(reference "#PWR030")
 					(unit 1)
 				)
 			)
@@ -6396,7 +6396,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "32b9dd8a-a80e-4087-ba0f-532e67aa712a")
-		(property "Reference" "C25"
+		(property "Reference" "C27"
 			(at 217.932 48.514 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6482,7 +6482,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C25")
+					(reference "C27")
 					(unit 1)
 				)
 			)
@@ -6500,7 +6500,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "33ddc14d-b4a1-431b-989e-bda04aabb9c2")
-		(property "Reference" "#PWR036"
+		(property "Reference" "#PWR038"
 			(at 187.96 58.42 0)
 			(hide yes)
 			(show_name no)
@@ -6560,7 +6560,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR036")
+					(reference "#PWR038")
 					(unit 1)
 				)
 			)
@@ -6578,7 +6578,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "3f68e8a6-29c6-49ba-a2c0-e467678474c2")
-		(property "Reference" "#PWR037"
+		(property "Reference" "#PWR039"
 			(at 199.39 48.26 0)
 			(hide yes)
 			(show_name no)
@@ -6638,7 +6638,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR037")
+					(reference "#PWR039")
 					(unit 1)
 				)
 			)
@@ -6657,7 +6657,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "3fd77a2d-629a-4164-b721-4e8ad0a13fdf")
-		(property "Reference" "#PWR027"
+		(property "Reference" "#PWR029"
 			(at 96.52 62.23 0)
 			(hide yes)
 			(show_name no)
@@ -6718,7 +6718,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR027")
+					(reference "#PWR029")
 					(unit 1)
 				)
 			)
@@ -6735,7 +6735,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "423e4283-a328-4562-bac7-2dd184913d7d")
-		(property "Reference" "C26"
+		(property "Reference" "C28"
 			(at 226.568 48.514 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6821,7 +6821,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C26")
+					(reference "C28")
 					(unit 1)
 				)
 			)
@@ -6839,7 +6839,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "474cf14d-ccd1-49ac-ad02-7555c5670aa0")
-		(property "Reference" "#PWR023"
+		(property "Reference" "#PWR025"
 			(at 30.48 76.2 0)
 			(hide yes)
 			(show_name no)
@@ -6899,7 +6899,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR023")
+					(reference "#PWR025")
 					(unit 1)
 				)
 			)
@@ -6916,7 +6916,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "48d8fa7b-4bb2-4a55-b156-1f237d4e0dcc")
-		(property "Reference" "R16"
+		(property "Reference" "R17"
 			(at 214.122 77.216 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7001,7 +7001,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "R16")
+					(reference "R17")
 					(unit 1)
 				)
 			)
@@ -7110,7 +7110,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "5c2c6401-c059-4998-8696-84b3f6e3f629")
-		(property "Reference" "#PWR038"
+		(property "Reference" "#PWR040"
 			(at 199.39 63.5 0)
 			(hide yes)
 			(show_name no)
@@ -7170,7 +7170,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR038")
+					(reference "#PWR040")
 					(unit 1)
 				)
 			)
@@ -7188,7 +7188,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "6e26b010-9404-405c-ac35-b1e74bf33e1d")
-		(property "Reference" "#PWR025"
+		(property "Reference" "#PWR027"
 			(at 35.56 48.26 0)
 			(hide yes)
 			(show_name no)
@@ -7248,7 +7248,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR025")
+					(reference "#PWR027")
 					(unit 1)
 				)
 			)
@@ -7265,7 +7265,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "6f2372aa-34f0-4283-92e3-4efb7e93db64")
-		(property "Reference" "#PWR039"
+		(property "Reference" "#PWR041"
 			(at 220.98 82.55 0)
 			(hide yes)
 			(show_name no)
@@ -7325,7 +7325,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR039")
+					(reference "#PWR041")
 					(unit 1)
 				)
 			)
@@ -7342,7 +7342,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "717ef0c1-b72e-49f6-bc5a-963f121bb0f1")
-		(property "Reference" "C27"
+		(property "Reference" "C29"
 			(at 236.474 48.26 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7428,7 +7428,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C27")
+					(reference "C29")
 					(unit 1)
 				)
 			)
@@ -7446,7 +7446,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "7306c5a8-6cc9-41e1-90b5-74d268e01593")
-		(property "Reference" "R14"
+		(property "Reference" "R15"
 			(at 155.702 86.868 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7574,7 +7574,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "R14")
+					(reference "R15")
 					(unit 1)
 				)
 			)
@@ -7591,7 +7591,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "7bd7a3dc-860c-4b11-b623-7c44bd000b8f")
-		(property "Reference" "#PWR041"
+		(property "Reference" "#PWR043"
 			(at 236.22 63.5 0)
 			(hide yes)
 			(show_name no)
@@ -7651,7 +7651,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR041")
+					(reference "#PWR043")
 					(unit 1)
 				)
 			)
@@ -7668,7 +7668,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "7fa2bcdb-cb4f-4ede-9828-2080ad3e1da8")
-		(property "Reference" "C19"
+		(property "Reference" "C21"
 			(at 125.222 51.054 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7754,7 +7754,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C19")
+					(reference "C21")
 					(unit 1)
 				)
 			)
@@ -7918,7 +7918,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "8bc423a2-0c84-4af1-bc63-b9319be62843")
-		(property "Reference" "C24"
+		(property "Reference" "C26"
 			(at 217.17 72.39 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8003,7 +8003,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C24")
+					(reference "C26")
 					(unit 1)
 				)
 			)
@@ -8180,7 +8180,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "965a8f01-fed5-4683-8635-d2a55a0c8a54")
-		(property "Reference" "#PWR024"
+		(property "Reference" "#PWR026"
 			(at 30.48 91.44 0)
 			(hide yes)
 			(show_name no)
@@ -8241,7 +8241,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR024")
+					(reference "#PWR026")
 					(unit 1)
 				)
 			)
@@ -8398,7 +8398,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "9ae413a0-c518-4dd7-b50d-332d1816bc80")
-		(property "Reference" "C22"
+		(property "Reference" "C24"
 			(at 151.638 50.8 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8484,7 +8484,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C22")
+					(reference "C24")
 					(unit 1)
 				)
 			)
@@ -8502,7 +8502,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "9cfd9871-ab6e-4de7-8ef7-e01765a84fd5")
-		(property "Reference" "R12"
+		(property "Reference" "R13"
 			(at 101.092 75.438 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8630,7 +8630,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "R12")
+					(reference "R13")
 					(unit 1)
 				)
 			)
@@ -8647,7 +8647,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "ae6817b2-9bdb-49d9-b88c-22e26d6f19ca")
-		(property "Reference" "R11"
+		(property "Reference" "R12"
 			(at 70.104 74.168 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8775,7 +8775,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "R11")
+					(reference "R12")
 					(unit 1)
 				)
 			)
@@ -8792,7 +8792,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "b11fcd8a-7cc7-4664-a44f-529464eae18c")
-		(property "Reference" "#PWR035"
+		(property "Reference" "#PWR037"
 			(at 173.99 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -8852,7 +8852,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR035")
+					(reference "#PWR037")
 					(unit 1)
 				)
 			)
@@ -8869,7 +8869,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "b9be5654-dab2-42f2-8d33-a69b9ff6c77f")
-		(property "Reference" "C20"
+		(property "Reference" "C22"
 			(at 133.858 51.054 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8955,7 +8955,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C20")
+					(reference "C22")
 					(unit 1)
 				)
 			)
@@ -8974,7 +8974,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "bcfb4c3d-f63e-4785-a32e-fafcbc7fd815")
-		(property "Reference" "#PWR030"
+		(property "Reference" "#PWR032"
 			(at 151.13 66.04 0)
 			(hide yes)
 			(show_name no)
@@ -9034,7 +9034,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR030")
+					(reference "#PWR032")
 					(unit 1)
 				)
 			)
@@ -9052,7 +9052,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "c0aa1c69-da8b-48c2-a789-ad6ba0f16e31")
-		(property "Reference" "C18"
+		(property "Reference" "C20"
 			(at 37.592 76.454 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9182,7 +9182,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C18")
+					(reference "C20")
 					(unit 1)
 				)
 			)
@@ -9201,7 +9201,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "c1cf8798-788a-44c6-a591-d1a9f69645b5")
-		(property "Reference" "#PWR033"
+		(property "Reference" "#PWR035"
 			(at 166.37 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -9261,7 +9261,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR033")
+					(reference "#PWR035")
 					(unit 1)
 				)
 			)
@@ -9278,7 +9278,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "c82a1b4e-48d1-400b-8c1d-e403a79d45b3")
-		(property "Reference" "C21"
+		(property "Reference" "C23"
 			(at 143.002 51.054 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9365,7 +9365,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C21")
+					(reference "C23")
 					(unit 1)
 				)
 			)
@@ -9383,7 +9383,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "cebb9aac-86b9-495a-a4bb-fe897bda6ba0")
-		(property "Reference" "#PWR032"
+		(property "Reference" "#PWR034"
 			(at 163.83 58.42 0)
 			(hide yes)
 			(show_name no)
@@ -9443,7 +9443,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR032")
+					(reference "#PWR034")
 					(unit 1)
 				)
 			)
@@ -9460,7 +9460,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "d047601d-21b1-4ba3-885a-837b777a0f52")
-		(property "Reference" "C17"
+		(property "Reference" "C19"
 			(at 31.242 57.404 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9590,7 +9590,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C17")
+					(reference "C19")
 					(unit 1)
 				)
 			)
@@ -9607,7 +9607,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "d693becd-55f0-4838-9872-f746a9d4706d")
-		(property "Reference" "#PWR029"
+		(property "Reference" "#PWR031"
 			(at 124.46 50.8 0)
 			(hide yes)
 			(show_name no)
@@ -9667,7 +9667,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR029")
+					(reference "#PWR031")
 					(unit 1)
 				)
 			)
@@ -9684,7 +9684,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "e12a425b-7648-4102-a764-6919c92954d2")
-		(property "Reference" "C23"
+		(property "Reference" "C25"
 			(at 199.898 49.784 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9770,7 +9770,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "C23")
+					(reference "C25")
 					(unit 1)
 				)
 			)
@@ -9788,7 +9788,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "e3a54be3-5570-4463-8d3f-819d6cfe1a93")
-		(property "Reference" "#PWR026"
+		(property "Reference" "#PWR028"
 			(at 35.56 71.12 0)
 			(hide yes)
 			(show_name no)
@@ -9849,7 +9849,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR026")
+					(reference "#PWR028")
 					(unit 1)
 				)
 			)
@@ -9868,7 +9868,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "e75b5128-394d-4e17-8e28-791166ea762b")
-		(property "Reference" "#PWR031"
+		(property "Reference" "#PWR033"
 			(at 152.4 99.06 0)
 			(hide yes)
 			(show_name no)
@@ -9929,7 +9929,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR031")
+					(reference "#PWR033")
 					(unit 1)
 				)
 			)
@@ -9947,7 +9947,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "f549cad7-70be-437e-8f9c-10e020e3ae4f")
-		(property "Reference" "#PWR040"
+		(property "Reference" "#PWR042"
 			(at 236.22 48.26 0)
 			(hide yes)
 			(show_name no)
@@ -10007,7 +10007,7 @@
 		(instances
 			(project "EchoLink"
 				(path "/5ec136fb-117f-4441-8cd4-5af677e4bcec/ca32723f-8b20-4c68-9522-e1eb244d911a"
-					(reference "#PWR040")
+					(reference "#PWR042")
 					(unit 1)
 				)
 			)
