@@ -5697,7 +5697,7 @@
 		(dnp no)
 		(uuid "06ddab0c-8f85-4a75-8028-2ec331e3097a")
 		(property "Reference" "R10"
-			(at 38.1 48.514 0)
+			(at 38.862 48.514 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects

@@ -64,7 +64,7 @@
           "min_island_area": 9.99999999996,
           "min_thickness": 0.25,
           "pad_connection": 1,
-          "remove_islands": 0,
+          "remove_islands": 1,
           "thermal_relief_gap": 0.5,
           "thermal_relief_spoke_width": 0.5
         }
@@ -210,7 +210,14 @@
         }
       ],
       "track_widths": [
-        0.0
+        0.0,
+        0.127,
+        0.254,
+        0.381,
+        0.508,
+        0.762,
+        1.298585,
+        1.524
       ],
       "tuning_pattern_settings": {
         "diff_pair_defaults": {
