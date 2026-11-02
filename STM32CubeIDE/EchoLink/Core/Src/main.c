@@ -322,33 +322,16 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(ISO_STB_GPIO_Port, ISO_STB_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LORA_nRST_Pin|LORA_SPI1_NSS_Pin|PWR_IO1_Pin|PWR_IO2_Pin
                           |PWR_IO3_Pin|PWR_IO4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LORA_RXEN_GPIO_Port, LORA_RXEN_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin : ISO_STB_Pin */
-  GPIO_InitStruct.Pin = ISO_STB_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(ISO_STB_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : ISO_FNC_Pin */
-  GPIO_InitStruct.Pin = ISO_FNC_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(ISO_FNC_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(GPIOB, LORA_RXEN_Pin|ISO_FNC_Pin|ISO_STB_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : MOD_OPT_Pin */
   GPIO_InitStruct.Pin = MOD_OPT_Pin;
@@ -365,18 +348,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LORA_RXEN_Pin */
-  GPIO_InitStruct.Pin = LORA_RXEN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LORA_RXEN_GPIO_Port, &GPIO_InitStruct);
-
   /*Configure GPIO pin : LORA_BUSY_Pin */
   GPIO_InitStruct.Pin = LORA_BUSY_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(LORA_BUSY_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LORA_RXEN_Pin ISO_FNC_Pin ISO_STB_Pin */
+  GPIO_InitStruct.Pin = LORA_RXEN_Pin|ISO_FNC_Pin|ISO_STB_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PWR_SPEED_Pin */
   GPIO_InitStruct.Pin = PWR_SPEED_Pin;

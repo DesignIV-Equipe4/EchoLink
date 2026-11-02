@@ -57,10 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define ISO_STB_Pin GPIO_PIN_13
-#define ISO_STB_GPIO_Port GPIOC
-#define ISO_FNC_Pin GPIO_PIN_14
-#define ISO_FNC_GPIO_Port GPIOC
 #define OSC_IN_Pin GPIO_PIN_0
 #define OSC_IN_GPIO_Port GPIOH
 #define OSC_OUT_Pin GPIO_PIN_1
@@ -81,10 +77,10 @@ void Error_Handler(void);
 #define LORA_SPI1_MISO_GPIO_Port GPIOA
 #define LORA_SPI1_MOSI_Pin GPIO_PIN_7
 #define LORA_SPI1_MOSI_GPIO_Port GPIOA
-#define LORA_RXEN_Pin GPIO_PIN_0
-#define LORA_RXEN_GPIO_Port GPIOB
-#define LORA_BUSY_Pin GPIO_PIN_1
+#define LORA_BUSY_Pin GPIO_PIN_0
 #define LORA_BUSY_GPIO_Port GPIOB
+#define LORA_RXEN_Pin GPIO_PIN_1
+#define LORA_RXEN_GPIO_Port GPIOB
 #define BMS_LPUART1_RX_Pin GPIO_PIN_10
 #define BMS_LPUART1_RX_GPIO_Port GPIOB
 #define BMS_LPUART1_TX_Pin GPIO_PIN_11
@@ -107,6 +103,10 @@ void Error_Handler(void);
 #define SYS_SWCLK_GPIO_Port GPIOA
 #define SYS_SWO_Pin GPIO_PIN_3
 #define SYS_SWO_GPIO_Port GPIOB
+#define ISO_FNC_Pin GPIO_PIN_4
+#define ISO_FNC_GPIO_Port GPIOB
+#define ISO_STB_Pin GPIO_PIN_5
+#define ISO_STB_GPIO_Port GPIOB
 #define ISO_CAN1_RXD_Pin GPIO_PIN_8
 #define ISO_CAN1_RXD_GPIO_Port GPIOB
 #define ISO_CAN1_TXD_Pin GPIO_PIN_9
