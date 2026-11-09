@@ -4060,6 +4060,10 @@
 		(uuid "4f8322a3-d31a-41a2-af8e-415e3a8f1fdb")
 	)
 	(no_connect
+		(at 144.78 114.3)
+		(uuid "63b45846-b5bc-4379-8a5a-21fcf0aae106")
+	)
+	(no_connect
 		(at 99.06 69.85)
 		(uuid "640ede7c-4af9-4b75-a24f-76350b389bc8")
 	)
@@ -4250,16 +4254,6 @@
 			(type default)
 		)
 		(uuid "1b4b41ef-dd16-47a1-9f87-2de0958c2324")
-	)
-	(wire
-		(pts
-			(xy 144.78 114.3) (xy 156.21 114.3)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1cea84cd-81b0-41db-808d-cc7634bb0fdd")
 	)
 	(wire
 		(pts
@@ -6162,31 +6156,6 @@
 		(uuid "5593c530-0420-4954-98d7-15bfd3bb3e79")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 166.7547 88.9 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-	)
-	(global_label "PWR_SPEED"
-		(shape input)
-		(at 156.21 114.3 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-				(thickness 0.1588)
-			)
-			(justify left)
-		)
-		(uuid "5683c65e-648a-4d45-a640-2c2c1b368f0e")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 170.2017 114.3 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
