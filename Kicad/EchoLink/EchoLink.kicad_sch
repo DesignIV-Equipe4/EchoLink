@@ -4048,10 +4048,6 @@
 		(uuid "0cac087a-e17c-418f-8caa-e98bf8a08be1")
 	)
 	(no_connect
-		(at 144.78 81.28)
-		(uuid "25c4e60a-49e0-4cc3-b695-fbae1a61d420")
-	)
-	(no_connect
 		(at 156.21 109.22)
 		(uuid "487265f8-d66e-4406-9d95-542a433ef2aa")
 	)
@@ -4404,6 +4400,16 @@
 			(type default)
 		)
 		(uuid "34d63b75-4d48-494b-9ca7-37c32b465ed6")
+	)
+	(wire
+		(pts
+			(xy 144.78 81.28) (xy 156.21 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "379b3261-8f7f-4afd-9d74-4eef87d7eb68")
 	)
 	(wire
 		(pts
@@ -5890,6 +5896,31 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+			)
+		)
+	)
+	(global_label "DEBUG_LPTIM1_OUT"
+		(shape input)
+		(at 156.21 81.28 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.1588)
+			)
+			(justify left)
+		)
+		(uuid "2ec5d8ef-b90e-4dbe-9a7b-18f55912924e")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 177.5799 81.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 			)
 		)
 	)
@@ -10496,7 +10527,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/yageo/CC0402KRX5R9BB104/5883338"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/murata-electronics/GRM188R61E475KE11D/3900465"
 			(at 189.23 100.33 0)
 			(hide yes)
 			(show_name no)

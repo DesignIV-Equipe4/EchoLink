@@ -81,6 +81,8 @@ void Error_Handler(void);
 #define LORA_BUSY_GPIO_Port GPIOB
 #define LORA_RXEN_Pin GPIO_PIN_1
 #define LORA_RXEN_GPIO_Port GPIOB
+#define DEBUG_LPTIM1_OUT_Pin GPIO_PIN_2
+#define DEBUG_LPTIM1_OUT_GPIO_Port GPIOB
 #define BMS_LPUART1_RX_Pin GPIO_PIN_10
 #define BMS_LPUART1_RX_GPIO_Port GPIOB
 #define BMS_LPUART1_TX_Pin GPIO_PIN_11
