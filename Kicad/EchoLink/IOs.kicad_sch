@@ -3960,6 +3960,17 @@
 				)
 			)
 		)
+		(property "DigitKey_Part_Number" "1516-QBLP601-AG15CT-ND"
+			(at 116.84 87.63 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "c42572ba-048a-4f3d-9684-bcce64c19d1d")
 		)
@@ -4176,6 +4187,17 @@
 			)
 		)
 		(property "Manufacturer_Part_Number" "QBLP601-AG15"
+			(at 53.34 81.28 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "1516-QBLP601-AG15CT-ND"
 			(at 53.34 81.28 0)
 			(hide yes)
 			(show_name no)
@@ -4503,6 +4525,28 @@
 				)
 			)
 		)
+		(property "DigitKey_Part_Number" "WM2675-ND"
+			(at 35.56 58.42 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer_Part_Number" "0430450821"
+			(at 35.56 58.42 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "5"
 			(uuid "6508c788-90d4-4399-a62c-a3d4849e87ce")
 		)
@@ -4593,6 +4637,28 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 99.06 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "23-0436500303-ND"
+			(at 99.06 44.45 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer_Part_Number" "0436500303"
 			(at 99.06 44.45 0)
 			(hide yes)
 			(show_name no)
@@ -4822,6 +4888,17 @@
 			)
 		)
 		(property "Manufacturer_Part_Number" "ERA-3AEB152V"
+			(at 44.45 81.28 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "P1.5KDBCT-ND"
 			(at 44.45 81.28 90)
 			(hide yes)
 			(show_name no)
@@ -5236,6 +5313,17 @@
 			)
 		)
 		(property "Manufacturer_Part_Number" "ERA-3AEB152V"
+			(at 107.95 87.63 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "P1.5KDBCT-ND"
 			(at 107.95 87.63 90)
 			(hide yes)
 			(show_name no)

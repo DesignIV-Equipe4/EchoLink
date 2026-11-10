@@ -6422,6 +6422,17 @@
 				)
 			)
 		)
+		(property "DigitKey_Part_Number" "311-10.0KHRCT-ND"
+			(at 35.56 49.53 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "3c90923e-9984-4068-955b-0f55c6c08261")
 		)
@@ -6559,6 +6570,17 @@
 			)
 		)
 		(property "Manufacturer_Part_Number" "ERA-3AEB152V"
+			(at 147.32 82.55 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "P1.5KDBCT-ND"
 			(at 147.32 82.55 90)
 			(hide yes)
 			(show_name no)
@@ -6821,7 +6843,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/yageo/RC0805FR-0759RL/728044"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/koa-speer-electronics-inc/RK73H1JTTD59R0F/9845371"
 			(at 196.85 71.12 0)
 			(hide yes)
 			(show_name no)
@@ -6853,7 +6875,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "RC0805FR-0759RL"
+		(property "Manufacturer_Part_Number" "RK73H1JTTD59R0F"
+			(at 196.85 71.12 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "2019-RK73H1JTTD59R0FCT-ND"
 			(at 196.85 71.12 0)
 			(hide yes)
 			(show_name no)
@@ -7000,7 +7033,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/samsung-electro-mechanics/CL21A106KAYNNNE/3888549"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/taiyo-yuden/LMK107BBJ106MALT/3662195"
 			(at 217.17 50.8 0)
 			(hide yes)
 			(show_name no)
@@ -7033,7 +7066,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "CL21A106KAYNNNE"
+		(property "Manufacturer_Part_Number" "LMK107BBJ106MALT"
+			(at 217.17 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "587-3258-1-ND"
 			(at 217.17 50.8 0)
 			(hide yes)
 			(show_name no)
@@ -7193,6 +7237,28 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
+			(at 224.79 74.93 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "WM7485-ND"
+			(at 224.79 74.93 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer_Part_Number" "0430450423"
 			(at 224.79 74.93 0)
 			(hide yes)
 			(show_name no)
@@ -7541,7 +7607,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/samsung-electro-mechanics/CL21B105KBFNNNE/3886687"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/C0603C105K4RACTU/2199788"
 			(at 226.06 50.8 0)
 			(hide yes)
 			(show_name no)
@@ -7574,7 +7640,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "CL21B105KBFNNNE"
+		(property "Manufacturer_Part_Number" "C0603C105K4RACTU"
+			(at 226.06 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "399-C0603C105K4RACTUCT-ND"
 			(at 226.06 50.8 0)
 			(hide yes)
 			(show_name no)
@@ -7644,7 +7721,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/yageo/RC0805FR-0759RL/728044"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/koa-speer-electronics-inc/RK73H1JTTD59R0F/9845371"
 			(at 196.85 78.74 0)
 			(hide yes)
 			(show_name no)
@@ -7676,7 +7753,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "RC0805FR-0759RL"
+		(property "Manufacturer_Part_Number" "RK73H1JTTD59R0F"
+			(at 196.85 78.74 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "2019-RK73H1JTTD59R0FCT-ND"
 			(at 196.85 78.74 0)
 			(hide yes)
 			(show_name no)
@@ -7761,6 +7849,28 @@
 		)
 		(property "Description" ""
 			(at 83.82 53.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "J502-ND"
+			(at 83.82 53.34 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Manufacturer_Part_Number" "142-0701-801"
+			(at 83.82 53.34 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8103,7 +8213,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "CL21B103KAANNNC"
+		(property "Manufacturer_Part_Number" "CC0603KRX7R9BB103"
+			(at 236.22 50.8 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "311-1085-1-ND"
 			(at 236.22 50.8 0)
 			(hide yes)
 			(show_name no)
@@ -8260,6 +8381,17 @@
 				)
 			)
 		)
+		(property "DigitKey_Part_Number" "311-10.0KHRCT-ND"
+			(at 152.4 87.63 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "2"
 			(uuid "b88bc1be-6fd3-4323-850f-a78ecb163400")
 		)
@@ -8396,7 +8528,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/samsung-electro-mechanics/CL21A106KAYNNNE/3888549"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/taiyo-yuden/LMK107BBJ106MALT/3662195"
 			(at 124.46 53.34 0)
 			(hide yes)
 			(show_name no)
@@ -8429,7 +8561,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "CL21A106KAYNNNE"
+		(property "Manufacturer_Part_Number" "LMK107BBJ106MALT"
+			(at 124.46 53.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "587-3258-1-ND"
 			(at 124.46 53.34 0)
 			(hide yes)
 			(show_name no)
@@ -8587,6 +8730,17 @@
 				)
 			)
 		)
+		(property "DigitKey_Part_Number" "1934-1472-1-ND"
+			(at 200.66 45.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "1"
 			(uuid "f065c342-e8fd-4152-9205-5d841d09356c")
 		)
@@ -8646,7 +8800,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/C0603C104K3RACTU/416044"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/C0603C104K5RACTU/1465594"
 			(at 203.2 74.93 0)
 			(hide yes)
 			(show_name no)
@@ -8678,7 +8832,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "C0603C104K3RACTU"
+		(property "Manufacturer_Part_Number" "C0603C104K5RACTU"
+			(at 203.2 74.93 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "399-C0603C104K5RACTUCT-ND"
 			(at 203.2 74.93 90)
 			(hide yes)
 			(show_name no)
@@ -8872,6 +9037,17 @@
 				)
 			)
 		)
+		(property "DigitKey_Part_Number" "296-ISOW1044BDFMRCT-ND"
+			(at 171.45 74.93 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(pin "19"
 			(uuid "b212d20d-9923-458a-ae41-a2661727fdc5")
 		)
@@ -8950,7 +9126,7 @@
 		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "99be238e-b69d-429c-b34c-eef38ad7f4d1")
 		(property "Reference" "U2"
@@ -9161,7 +9337,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "CL21B103KAANNNC"
+		(property "Manufacturer_Part_Number" "CC0603KRX7R9BB103"
+			(at 151.13 53.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "311-1085-1-ND"
 			(at 151.13 53.34 0)
 			(hide yes)
 			(show_name no)
@@ -9229,7 +9416,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/yageo/AC0402FR-0722RL/6006309"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/stackpole-electronics-inc/RMCF0603FT22R0/1760726"
 			(at 72.39 76.2 0)
 			(hide yes)
 			(show_name no)
@@ -9306,7 +9493,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "AC0402FR-0722RL"
+		(property "Manufacturer_Part_Number" "RMCF0603FT22R0"
+			(at 72.39 76.2 90)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "RMCF0603FT22R0CT-ND"
 			(at 72.39 76.2 90)
 			(hide yes)
 			(show_name no)
@@ -9453,7 +9651,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/samsung-electro-mechanics/CL21B105KBFNNNE/3886687"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/C0603C105K4RACTU/2199788"
 			(at 133.35 53.34 0)
 			(hide yes)
 			(show_name no)
@@ -9486,7 +9684,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "CL21B105KBFNNNE"
+		(property "Manufacturer_Part_Number" "C0603C105K4RACTU"
+			(at 133.35 53.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "399-C0603C105K4RACTUCT-ND"
 			(at 133.35 53.34 0)
 			(hide yes)
 			(show_name no)
@@ -9558,7 +9767,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/T520D227M010ATE018/818906"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/yageo/CC0603KRX7R9BB103/302819"
 			(at 22.86 74.93 0)
 			(hide yes)
 			(show_name no)
@@ -9910,7 +10119,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/C0603C104K3RACTU/416044"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/C0603C104K5RACTU/1465594"
 			(at 142.24 53.34 0)
 			(hide yes)
 			(show_name no)
@@ -9943,7 +10152,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "C0603C104K3RACTU"
+		(property "Manufacturer_Part_Number" "C0603C104K5RACTU"
+			(at 142.24 53.34 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "399-C0603C104K5RACTUCT-ND"
 			(at 142.24 53.34 0)
 			(hide yes)
 			(show_name no)
@@ -10091,7 +10311,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/yageo/CC0402KRX5R9BB104/5883338"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/C0603C104K5RACTU/1465594"
 			(at 35.56 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -10168,7 +10388,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "CC0402KRX5R9BB104"
+		(property "Manufacturer_Part_Number" "C0603C104K5RACTU"
+			(at 35.56 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "399-C0603C104K5RACTUCT-ND"
 			(at 35.56 59.69 0)
 			(hide yes)
 			(show_name no)
@@ -10393,7 +10624,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/C0603C104K3RACTU/416044"
+		(property "Datasheet" "https://www.digikey.ca/en/products/detail/kemet/C0603C104K5RACTU/1465594"
 			(at 199.39 52.07 0)
 			(hide yes)
 			(show_name no)
@@ -10426,7 +10657,18 @@
 				)
 			)
 		)
-		(property "Manufacturer_Part_Number" "C0603C104K3RACTU"
+		(property "Manufacturer_Part_Number" "C0603C104K5RACTU"
+			(at 199.39 52.07 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "DigitKey_Part_Number" "399-C0603C104K5RACTUCT-ND"
 			(at 199.39 52.07 0)
 			(hide yes)
 			(show_name no)
