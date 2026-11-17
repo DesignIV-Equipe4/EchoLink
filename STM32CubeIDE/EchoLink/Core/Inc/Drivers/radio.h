@@ -1,0 +1,98 @@
+#ifndef DRIVERS_RADIO_H
+#define DRIVERS_RADIO_H
+
+#include <stdint.h>
+#include <stdbool.h>
+#include "Drivers/sx1268.h"
+
+
+/* Constants E22-400M33S*/
+#define RADIO_MAX_PAYLOAD_LENGTH            (SX1268_MAX_FIFO_SIZE - 1U) // 255
+
+#define RADIO_MS_TO_RTC_STEPS(ms)           ((uint32_t)(ms) << 6U)
+#define RADIO_RECEIVE_CONTINUOUS_TIMEOUT    0xFFFFFFUL
+#define RADIO_TX_SINGLE_NO_TIMEOUT          0x000000UL
+
+/* Radio state machine */
+typedef enum {
+    RADIO_STATE_IDLE = 0,
+    RADIO_STATE_RX_RUNNING,
+    RADIO_STATE_TX_RUNNING,
+    RADIO_STATE_CAD
+} radio_state_t;
+
+/* Configuration */
+typedef struct {
+    uint32_t                freq_hz;
+    int8_t                  tx_power_dbm;
+    sx1268_lora_sf_t        sf;
+    sx1268_lora_bw_t        bw;
+    sx1268_lora_cr_t        cr;
+    uint16_t                preamble_len;
+    uint8_t                 symb_timeout;
+    bool                    fixed_len;
+    uint8_t                 payload_len;
+    bool                    crc_on;
+    bool                    invert_iq;
+    bool                    rx_continuous;
+    uint32_t                tx_timeout_ms;
+} radio_lora_config_t;
+
+/* Event callbacks */
+typedef struct {
+	void (*tx_done)(void);
+	void (*tx_timeout)(void);
+	void (*rx_done)(const uint8_t *payload, uint8_t size, int8_t rssi_dbm, int8_t snr_db);
+	void (*rx_timeout)(void);
+	void (*rx_error)(void);
+	void (*cad_done)(bool channel_activity_detected);
+} radio_events_t;
+
+/* Main instance structure */
+typedef struct {
+    sx1268_t            	sx1268;
+    radio_events_t          events;
+    volatile radio_state_t  state;
+    volatile bool           irq_fired;
+    uint32_t                tx_timeout_ms;
+    bool                    cad_pending_after_rx;
+    uint8_t                 rx_buffer[RADIO_MAX_PAYLOAD_LENGTH];
+} radio_t;
+
+
+/* Prototypes */
+bool Radio_Init(radio_t *dev, const radio_events_t *events);
+radio_state_t Radio_GetStatus(const radio_t *dev);
+bool Radio_WakeupInit(radio_t *dev, const radio_events_t *events, const radio_lora_config_t *cfg);
+
+bool Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg);
+bool Radio_SetChannel(radio_t *dev, uint32_t freq_hz);
+void Radio_SetTxPower(radio_t *dev, int8_t power_dbm);
+void Radio_SetPublicNetwork(radio_t *dev, bool is_public);
+void Radio_SetMaxPayloadLength(radio_t *dev, uint8_t max_len);
+
+bool Radio_CheckRfFrequency(uint32_t freq_hz);
+uint32_t Radio_GetTimeOnAir(const radio_t *dev, uint8_t pkt_len);
+uint32_t Radio_GetWakeupTime(void);
+
+bool Radio_IsChannelFree(radio_t *dev, uint32_t freq_hz, int16_t rssi_thresh_dbm, uint32_t carrier_sense_time_ms);
+uint32_t Radio_GetRandom(radio_t *dev);
+bool Radio_IsDio1High(const radio_t *dev);
+
+bool Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size);
+void Radio_Receive(radio_t *dev, uint32_t timeout_ms);
+void Radio_ReceiveBoosted(radio_t *dev, uint32_t timeout_ms);
+void Radio_StartCad(radio_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t rx_timeout_ms);
+void Radio_SetRxDutyCycle(radio_t *dev, uint32_t rx_time_ms, uint32_t sleep_time_ms);
+void Radio_SetTxContinuousWave(radio_t *dev, uint32_t freq_hz, int8_t power_dbm);
+
+void Radio_Sleep(radio_t *dev);
+void Radio_Standby(radio_t *dev);
+int8_t Radio_GetRssiInstant(radio_t *dev);
+
+/* Interrupt handling */
+void Radio_OnDio1Irq(radio_t *dev);
+void Radio_IrqProcess(radio_t *dev);
+
+
+#endif /* DRIVERS_RADIO_H */

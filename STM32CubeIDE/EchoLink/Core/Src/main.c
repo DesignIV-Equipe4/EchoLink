@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Drivers/radio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -326,11 +326,11 @@ static void MX_SPI1_Init(void)
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_4BIT;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -365,11 +365,13 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, LORA_nRST_Pin|LORA_SPI1_NSS_Pin|PWR_IO1_Pin|PWR_IO2_Pin
-                          |PWR_IO3_Pin|PWR_IO4_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LORA_nRST_Pin|LORA_SPI1_NSS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LORA_RXEN_Pin|ISO_FNC_Pin|ISO_STB_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, PWR_IO1_Pin|PWR_IO2_Pin|PWR_IO3_Pin|PWR_IO4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : MOD_OPT_Pin */
   GPIO_InitStruct.Pin = MOD_OPT_Pin;
@@ -377,10 +379,17 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(MOD_OPT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LORA_nRST_Pin LORA_SPI1_NSS_Pin PWR_IO1_Pin PWR_IO2_Pin
-                           PWR_IO3_Pin PWR_IO4_Pin */
-  GPIO_InitStruct.Pin = LORA_nRST_Pin|LORA_SPI1_NSS_Pin|PWR_IO1_Pin|PWR_IO2_Pin
-                          |PWR_IO3_Pin|PWR_IO4_Pin;
+  /*Configure GPIO pin : LORA_nRST_Pin */
+  GPIO_InitStruct.Pin = LORA_nRST_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LORA_nRST_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LORA_SPI1_NSS_Pin PWR_IO1_Pin PWR_IO2_Pin PWR_IO3_Pin
+                           PWR_IO4_Pin */
+  GPIO_InitStruct.Pin = LORA_SPI1_NSS_Pin|PWR_IO1_Pin|PWR_IO2_Pin|PWR_IO3_Pin
+                          |PWR_IO4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
