@@ -1,5 +1,5 @@
-#ifndef DRIVERS_SX1268_H
-#define DRIVERS_SX1268_H
+#ifndef INC_DRIVERS_SX1268_H
+#define INC_DRIVERS_SX1268_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -298,7 +298,7 @@ typedef struct {
 	uint16_t                    nrst_pin;
 	GPIO_TypeDef               	*rxen_port;
 	uint16_t                    rxen_pin;
-	GPIO_TypeDef               *dio1_port; // wkup
+	GPIO_TypeDef               	*dio1_port; // wkup
 	uint16_t                    dio1_pin;
 
 	sx1268_op_mode_t            op_mode;
@@ -350,4 +350,4 @@ void SX1268_StartCad(sx1268_t *dev);
 uint32_t SX1268_GetLoraTimeOnAir(const sx1268_t *dev, uint8_t pkt_len);
 
 
-#endif /* DRIVERS_SX1268_H */
+#endif /* INC_DRIVERS_SX1268_H */

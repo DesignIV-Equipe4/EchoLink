@@ -1,5 +1,5 @@
-#ifndef DRIVERS_RADIO_H
-#define DRIVERS_RADIO_H
+#ifndef INC_DRIVERS_RADIO_H
+#define INC_DRIVERS_RADIO_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -95,4 +95,4 @@ void Radio_OnDio1Irq(radio_t *dev);
 void Radio_IrqProcess(radio_t *dev);
 
 
-#endif /* DRIVERS_RADIO_H */
+#endif /* INC_DRIVERS_RADIO_H */

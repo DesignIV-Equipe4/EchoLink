@@ -1,0 +1,105 @@
+#include "Drivers/isow1044.h"
+#include <stddef.h>
+
+
+#define ISOW1044_PWRUP_TIME_MS (6U)
+
+
+isow1044_error_t ISOW1044_Init(isow1044_t *dev) {
+    if(dev == NULL || dev->hcan == NULL) {
+        return ISOW1044_ERROR_DEV;
+    }
+
+
+    ISOW1044_EnableDcdc(dev, dev->dcdc_on);
+
+    HAL_Delay(ISOW1044_PWRUP_TIME_MS);
+
+    if(ISOW1044_IsFaultActive(dev)) {
+        return ISOW1044_ERROR_DEV;
+    }
+
+    ISOW1044_SetMode(dev, dev->mode);
+
+    CAN_FilterTypeDef can_filter 	= {0};
+    can_filter.FilterBank           = 0;
+    can_filter.FilterMode           = CAN_FILTERMODE_IDMASK;
+    can_filter.FilterScale          = CAN_FILTERSCALE_32BIT;
+    can_filter.FilterIdHigh         = 0x0000;
+    can_filter.FilterIdLow          = 0x0000;
+    can_filter.FilterMaskIdHigh     = 0x0000;
+    can_filter.FilterMaskIdLow      = 0x0000;
+    can_filter.FilterFIFOAssignment = CAN_RX_FIFO0;
+    can_filter.FilterActivation     = ENABLE;
+    can_filter.SlaveStartFilterBank = 14;
+
+    if(HAL_CAN_ConfigFilter(dev->hcan, &can_filter) != HAL_OK) {
+        return ISOW1044_ERROR_CAN;
+    }
+
+    if(HAL_CAN_Start(dev->hcan) != HAL_OK) {
+        return ISOW1044_ERROR_CAN;
+    }
+
+    return HAL_CAN_ActivateNotification(dev->hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+}
+
+
+void ISOW1044_SetMode(isow1044_t *dev, isow1044_mode_t mode) {
+    if(mode == ISOW1044_MODE_NORMAL) {
+        HAL_GPIO_WritePin(dev->stb_port, dev->stb_pin, GPIO_PIN_RESET);
+    } else {
+        HAL_GPIO_WritePin(dev->stb_port, dev->stb_pin, GPIO_PIN_SET);
+    }
+
+    HAL_Delay(1);
+}
+
+
+void ISOW1044_EnableDcdc(isow1044_t *dev, bool enable) {
+    if(enable) {
+        HAL_GPIO_WritePin(dev->en_flt_port, dev->en_flt_pin, GPIO_PIN_SET);
+    } else {
+        HAL_GPIO_WritePin(dev->en_flt_port, dev->en_flt_pin, GPIO_PIN_RESET);
+    }
+}
+
+
+bool ISOW1044_IsFaultActive(isow1044_t *dev) {
+	return (HAL_GPIO_ReadPin(dev->en_flt_port, dev->en_flt_pin) == GPIO_PIN_RESET);
+}
+
+
+HAL_StatusTypeDef ISOW1044_SendCommand(isow1044_t *dev, uint32_t std_id, uint8_t *tx_data, uint8_t length) {
+	if(tx_data == NULL) {
+		return HAL_ERROR;
+	}
+
+	CAN_TxHeaderTypeDef tx_header = {0};
+	uint32_t tx_mailbox;
+
+	tx_header.StdId = std_id;
+	tx_header.ExtId = 0;
+	tx_header.IDE   = CAN_ID_STD;
+	tx_header.RTR   = CAN_RTR_DATA;
+	tx_header.DLC   = length;
+	tx_header.TransmitGlobalTime = DISABLE;
+
+	// Check available mailbox transmissions
+	if(HAL_CAN_GetTxMailboxesFreeLevel(dev->hcan) == 0) {
+		return HAL_BUSY;
+	}
+
+	return HAL_CAN_AddTxMessage(dev->hcan, &tx_header, tx_data, &tx_mailbox);
+}
+
+// Callback
+bool ISOW1044_ReceiveFrame(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *rx_header, uint8_t *rx_data) {
+    if(HAL_CAN_GetRxFifoFillLevel(hcan, CAN_RX_FIFO0) > 0) {
+        if(HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, rx_header, rx_data) == HAL_OK) {
+            return true;
+        }
+    }
+
+    return false;
+}
