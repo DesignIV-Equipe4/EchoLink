@@ -71,3 +71,7 @@ ODB_V2/
 # === Branch ===
 Documentation/
 README.md
+
+# === Nix / direnv ===
+.direnv/
+/build/
