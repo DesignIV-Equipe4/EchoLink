@@ -72,6 +72,8 @@ ODB_V2/
 Documentation/
 README.md
 
+.cache/
+
 # === Nix / direnv ===
 .direnv/
 /build/
