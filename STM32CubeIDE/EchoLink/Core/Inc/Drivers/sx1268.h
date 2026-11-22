@@ -19,13 +19,13 @@
 #define SX1268_PA_MAX_POWER_DBM             (22)
 
 /* Preamplification steps E22-400M33S (VCC = 5.0V) */
-#define SX1268_E22_TX_PWR_13DBM_SETPOINT    (-6) /* ~13-14 dBm SMA */
-#define SX1268_E22_TX_PWR_19DBM_SETPOINT    (-4) /* ~19 dBm SMA */
-#define SX1268_E22_TX_PWR_24DBM_SETPOINT    (-2) /* ~24 dBm SMA */
-#define SX1268_E22_TX_PWR_27DBM_SETPOINT    (2)  /* ~27 dBm SMA */
-#define SX1268_E22_TX_PWR_29DBM_SETPOINT    (4)  /* ~29 dBm SMA */
-#define SX1268_E22_TX_PWR_31DBM_SETPOINT    (7)  /* ~31.5 dBm SMA */
-#define SX1268_E22_TX_PWR_33DBM_SETPOINT    (14) /*  33 dBm SMA (max rated) */
+#define SX1268_TX_PWR_13DBM_SETPOINT    (-6) /* ~13-14 dBm SMA */
+#define SX1268_TX_PWR_19DBM_SETPOINT    (-4) /* ~19 dBm SMA */
+#define SX1268_TX_PWR_24DBM_SETPOINT    (-2) /* ~24 dBm SMA */
+#define SX1268_TX_PWR_27DBM_SETPOINT    (2)  /* ~27 dBm SMA */
+#define SX1268_TX_PWR_29DBM_SETPOINT    (4)  /* ~29 dBm SMA */
+#define SX1268_TX_PWR_31DBM_SETPOINT    (7)  /* ~31.5 dBm SMA */
+#define SX1268_TX_PWR_33DBM_SETPOINT    (14) /*  33 dBm SMA (max rated) */
 
 /* Stabilization time 32MHz TCXO & NRST (ms) */
 #define SX1268_NRST_HOLD_LOW_MS             2U

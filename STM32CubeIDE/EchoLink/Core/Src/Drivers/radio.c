@@ -11,7 +11,63 @@
  */
 
 /* Total wake-up time from Sleep mode including 5ms TCXO stabilization + 3ms margin */
-#define RADIO_TOTAL_WAKEUP_TIME_MS          (SX1268_TCXO_SETUP_TIME_MS + 3U)
+#define RADIO_TOTAL_WAKEUP_TIME_MS (SX1268_TCXO_SETUP_TIME_MS + 3U)
+
+// Power table for PA adaptation
+static const int8_t radio_pwr_lut[] = {
+		SX1268_TX_PWR_13DBM_SETPOINT, // idx 0: -6 dBm = 13-14dBm
+		SX1268_TX_PWR_19DBM_SETPOINT, // idx 1: -4 dBm = 19dBm
+		SX1268_TX_PWR_24DBM_SETPOINT, // idx 2: -2 dBm = 24dBm
+		SX1268_TX_PWR_27DBM_SETPOINT, // idx 3:  2 dBm = 27dBm
+		SX1268_TX_PWR_29DBM_SETPOINT, // idx 4:  4 dBm = 29dBm
+		SX1268_TX_PWR_31DBM_SETPOINT, // idx 5:  7 dBm = 31.5dBm
+		SX1268_TX_PWR_33DBM_SETPOINT  // idx 6: 14 dBm =  33dBm
+};
+#define RADIO_E22_PWR_LEVEL_COUNT (sizeof(radio_pwr_lut) / sizeof(radio_pwr_lut[0]))
+
+// Compute approximation of SNR with sf configuration
+static int8_t Radio_GetLoraSnrFloor(sx1268_lora_sf_t sf) {
+    switch(sf) {
+        case SX1268_LORA_SF5:
+        	return (-2);
+        case SX1268_LORA_SF6:
+        	return (-5);
+        case SX1268_LORA_SF7:
+        	return (-7);
+        case SX1268_LORA_SF8:
+        	return (-10);
+        case SX1268_LORA_SF9:
+        	return (-12);
+        case SX1268_LORA_SF10:
+        	return (-15);
+        case SX1268_LORA_SF11:
+        	return (-17);
+        case SX1268_LORA_SF12:
+        	return (-20);
+        default:
+        	return (-10);
+    }
+}
+
+// Return nearest index in radio_pwr_lut
+static int8_t Radio_FindPowerIndex(int8_t setpoint_dbm) {
+    for(uint8_t i = 0U; i < RADIO_E22_PWR_LEVEL_COUNT; i++) {
+        if(setpoint_dbm <= radio_pwr_lut[i]) {
+            return (int8_t)i;
+        }
+    }
+    return (int8_t)(RADIO_E22_PWR_LEVEL_COUNT - 1U);
+}
+
+static int8_t Radio_ClampPower(int8_t power_dbm) {
+    if(power_dbm > SX1268_TX_PWR_33DBM_SETPOINT) {
+        return SX1268_TX_PWR_33DBM_SETPOINT;
+    }
+    if(power_dbm < SX1268_PA_MIN_POWER_DBM) {
+        return SX1268_PA_MIN_POWER_DBM;
+    }
+    return power_dbm;
+}
 
 // Compute Low Data Rate Optimization flags
 static uint8_t Radio_ComputeLdro(sx1268_lora_sf_t sf, sx1268_lora_bw_t bw) {
@@ -67,17 +123,18 @@ static void Radio_StartRxInternal(radio_t *dev, uint32_t timeout_ms, bool booste
 
     // Convert timeout from milliseconds to 64 kHz RTC step
     uint32_t rtc_steps;
-    if(dev->sx1268.rx_continuous || (timeout_ms == 0U)) {
-        rtc_steps = RADIO_RECEIVE_CONTINUOUS_TIMEOUT;
-    } else {
-        rtc_steps = RADIO_MS_TO_RTC_STEPS(timeout_ms);
-        if(rtc_steps > 0xFFFFFEUL) {
-            rtc_steps = 0xFFFFFEUL; // clamp
-        }
-    }
+    if(timeout_ms == 0U) {
+		rtc_steps = dev->rx_continuous_cfg ? RADIO_RECEIVE_CONTINUOUS_TIMEOUT : 0x000000UL;
+	} else {
+		rtc_steps = RADIO_MS_TO_RTC_STEPS(timeout_ms);
+		if(rtc_steps > 0xFFFFFEUL) {
+			rtc_steps = 0xFFFFFEUL; // clamp
+		}
+	}
 
-    dev->state = RADIO_STATE_RX_RUNNING;
-    SX1268_SetRx(&dev->sx1268, rtc_steps, boosted);
+	dev->rx_boosted = boosted;
+	dev->state      = RADIO_STATE_RX_RUNNING;
+	SX1268_SetRx(&dev->sx1268, rtc_steps, boosted);
 }
 
 
@@ -93,17 +150,21 @@ bool Radio_Init(radio_t *dev, const radio_events_t *events) {
     }
 
     dev->state                = RADIO_STATE_IDLE;
-    dev->irq_fired            = false;
-    dev->tx_timeout_ms        = 3000U;
-    dev->cad_pending_after_rx = false;
+	dev->irq_fired            = false;
+	dev->tx_timeout_ms        = 3000U;
+	dev->tx_power_dbm         = SX1268_TX_PWR_24DBM_SETPOINT;
+	dev->rx_continuous_cfg    = true;
+	dev->rx_boosted           = true;
+	dev->cad_pending_after_rx = false;
 
     if(!SX1268_Init(&dev->sx1268)) {
         return false;
     }
 
-    // Default to 33 dBm SMA output setpoint (+14 dBm internal PA) and mask all IRQs
-    SX1268_SetTxParams(&dev->sx1268, SX1268_E22_TX_PWR_33DBM_SETPOINT, SX1268_RAMP_200_US);
-    SX1268_SetDio1IrqParams(&dev->sx1268, SX1268_IRQ_NONE);
+    // Set private LoraWan and set default to 33 dBm SMA output setpoint (+14 dBm internal PA) and mask all IRQs
+    SX1268_SetPublicNetwork(&dev->sx1268, false);
+	SX1268_SetTxParams(&dev->sx1268, dev->tx_power_dbm, SX1268_RAMP_200_US);
+	SX1268_SetDio1IrqParams(&dev->sx1268, SX1268_IRQ_NONE);
 
     return true;
 }
@@ -126,11 +187,14 @@ bool Radio_WakeupInit(radio_t *dev, const radio_events_t *events, const radio_lo
 
     // Restore software context
     dev->sx1268.op_mode          = SX1268_MODE_STDBY_RC;
-    dev->sx1268.packet_type      = SX1268_PACKET_TYPE_LORA;
-    dev->sx1268.image_calibrated = true;
-    dev->sx1268.rx_continuous    = cfg->rx_continuous;
-    dev->tx_timeout_ms           = cfg->tx_timeout_ms;
-    dev->cad_pending_after_rx    = false;
+	dev->sx1268.packet_type      = SX1268_PACKET_TYPE_LORA;
+	dev->sx1268.image_calibrated = true;
+	dev->sx1268.rx_continuous    = cfg->rx_continuous;
+	dev->rx_continuous_cfg       = cfg->rx_continuous;
+	dev->rx_boosted              = cfg->rx_boosted;
+	dev->tx_power_dbm            = Radio_ClampPower(cfg->tx_power_dbm);
+	dev->tx_timeout_ms           = cfg->tx_timeout_ms;
+	dev->cad_pending_after_rx    = false;
 
     dev->sx1268.lora_mod.spreading_factor = cfg->sf;
     dev->sx1268.lora_mod.bandwidth        = cfg->bw;
@@ -164,7 +228,7 @@ bool Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg) {
     }
 
     // Configure PA output power and ramp time
-    SX1268_SetTxParams(&dev->sx1268, cfg->tx_power_dbm, SX1268_RAMP_200_US);
+    Radio_SetTxPower(dev, cfg->tx_power_dbm);
 
     // Stop RX timeout timer only upon valid LoRa Header detection
     SX1268_SetStopTimerOnPreamble(&dev->sx1268, false);
@@ -191,8 +255,12 @@ bool Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg) {
     };
     SX1268_SetLoraPacketParams(&dev->sx1268, &pkt_params);
 
-    dev->sx1268.rx_continuous = cfg->rx_continuous;
-    dev->tx_timeout_ms        = cfg->tx_timeout_ms;
+    SX1268_SetPublicNetwork(&dev->sx1268, cfg->public_network);
+
+    dev->rx_continuous_cfg    = cfg->rx_continuous;
+	dev->sx1268.rx_continuous = cfg->rx_continuous;
+	dev->rx_boosted           = cfg->rx_boosted;
+	dev->tx_timeout_ms        = cfg->tx_timeout_ms;
 
     return true;
 }
@@ -204,7 +272,21 @@ bool Radio_SetChannel(radio_t *dev, uint32_t freq_hz) {
 
 // Change TX output power setpoint
 void Radio_SetTxPower(radio_t *dev, int8_t power_dbm) {
-    SX1268_SetTxParams(&dev->sx1268, power_dbm, SX1268_RAMP_200_US);
+    if(dev == NULL) {
+        return;
+    }
+
+    int8_t safe_pwr = Radio_ClampPower(power_dbm);
+    dev->tx_power_dbm = safe_pwr;
+    SX1268_SetTxParams(&dev->sx1268, safe_pwr, SX1268_RAMP_200_US);
+}
+
+// Change RX input power to boosted mode
+void Radio_SetRxBoosted(radio_t *dev, bool boosted) {
+    if(dev == NULL) {
+        return;
+    }
+    dev->rx_boosted = boosted;
 }
 
 // Switch between Public and Private LoRa SyncWord
@@ -216,6 +298,87 @@ void Radio_SetPublicNetwork(radio_t *dev, bool is_public) {
 void Radio_SetMaxPayloadLength(radio_t *dev, uint8_t max_len) {
     dev->sx1268.lora_pkt.payload_len = max_len;
     SX1268_SetLoraPacketParams(&dev->sx1268, &dev->sx1268.lora_pkt);
+}
+
+// Compute adaptation step of tx power needed
+int8_t Radio_ComputeAdaptiveTxPower(radio_t *dev, int8_t current_setpoint_dbm, int8_t rssi_dbm, int8_t snr_db) {
+    if(dev == NULL) {
+        return SX1268_TX_PWR_24DBM_SETPOINT;
+    }
+
+    int8_t idx = Radio_FindPowerIndex(current_setpoint_dbm);
+    int8_t snr_floor = Radio_GetLoraSnrFloor(dev->sx1268.lora_mod.spreading_factor);
+    int8_t snr_margin = (int8_t)(snr_db - snr_floor);
+    int8_t step = 0;
+
+    // Priority given to link reliability
+    if((snr_margin < RADIO_TPC_SNR_MARGIN_CRIT_DB) || (rssi_dbm < RADIO_TPC_RSSI_CRITICAL_DBM)) {
+        step = 2;
+    } else if((snr_margin < RADIO_TPC_SNR_MARGIN_LOW_DB) || (rssi_dbm < RADIO_TPC_RSSI_LOW_DBM)) {
+        step = 1;
+    }
+    // Protection against saturation at very short range
+    else if(rssi_dbm > RADIO_TPC_RSSI_SATURATION_DBM) {
+        step = -2;
+    }
+    // Power-saving only if RSSI and SNR margin are in hysteresis
+    else if((snr_margin > RADIO_TPC_SNR_MARGIN_HIGH_DB) && (rssi_dbm > RADIO_TPC_RSSI_HIGH_DBM)) {
+        step = -1;
+    }
+
+    idx = (int8_t)(idx + step);
+    if(idx < 0) {
+        idx = 0;
+    } else if(idx >= (int8_t)RADIO_E22_PWR_LEVEL_COUNT) {
+        idx = (int8_t)(RADIO_E22_PWR_LEVEL_COUNT - 1U);
+    }
+
+    return radio_pwr_lut[idx];
+}
+
+// Compute adaptation step of rx boost needed
+bool Radio_ComputeAdaptiveRxBoost(radio_t *dev, bool current_boosted, int8_t rssi_dbm, int8_t snr_db) {
+    if(dev == NULL) {
+        return true;
+    }
+
+    int8_t snr_floor  = Radio_GetLoraSnrFloor(dev->sx1268.lora_mod.spreading_factor);
+    int8_t snr_margin = (int8_t)(snr_db - snr_floor);
+
+    // Boosted gain if weak signal
+    if((rssi_dbm < RADIO_RX_BOOST_ON_RSSI_DBM) || (snr_margin < RADIO_RX_BOOST_ON_SNR_MARGIN_DB)) {
+        return true;
+    }
+
+    // Power-saving only if RSSI and SNR margin are in hysteresis
+    if((rssi_dbm > RADIO_RX_BOOST_OFF_RSSI_DBM) && (snr_margin > RADIO_RX_BOOST_OFF_SNR_MARGIN_DB)) {
+        return false;
+    }
+
+    return current_boosted;
+}
+
+// Compute and apply new tx power
+int8_t Radio_AdjustTxPower(radio_t *dev, int8_t rssi_dbm, int8_t snr_db) {
+    if(dev == NULL) {
+        return 0;
+    }
+
+    int8_t target_pwr = Radio_ComputeAdaptiveTxPower(dev, dev->tx_power_dbm, rssi_dbm, snr_db);
+    if(target_pwr != dev->tx_power_dbm) {
+        Radio_SetTxPower(dev, target_pwr);
+    }
+    return dev->tx_power_dbm;
+}
+
+// Compute and apply new rx power
+bool Radio_AdjustRxBoost(radio_t *dev, int8_t rssi_dbm, int8_t snr_db) {
+    if(dev == NULL) {
+        return true;
+    }
+
+    dev->rx_boosted = Radio_ComputeAdaptiveRxBoost(dev, dev->rx_boosted, rssi_dbm, snr_db);
+    return dev->rx_boosted;
 }
 
 // Verify if target frequency is within hardware limits
@@ -235,13 +398,20 @@ uint32_t Radio_GetWakeupTime(void) {
 
 // Perform Listen-Before-Talk RSSI
 bool Radio_IsChannelFree(radio_t *dev, uint32_t freq_hz, int16_t rssi_thresh_dbm, uint32_t carrier_sense_time_ms) {
-    if(!Radio_SetChannel(dev, freq_hz)) {
-        return false;
-    }
+	if(dev == NULL) {
+		return false;
+	}
 
     // Enter continuous RX mode
-    Radio_Receive(dev, 0U);
-    HAL_Delay(1U);
+	Radio_Standby(dev);
+	if(!Radio_SetChannel(dev, freq_hz)) {
+		return false;
+	}
+
+	// Temporary rx_continuous
+	SX1268_SetDio1IrqParams(&dev->sx1268, SX1268_IRQ_NONE);
+	SX1268_SetRx(&dev->sx1268, RADIO_RECEIVE_CONTINUOUS_TIMEOUT, dev->rx_boosted);
+	HAL_Delay(1U);
 
     // Sample instantaneous RSSI
     bool is_free = true;
@@ -255,6 +425,8 @@ bool Radio_IsChannelFree(radio_t *dev, uint32_t freq_hz, int16_t rssi_thresh_dbm
     }
 
     Radio_Standby(dev);
+    dev->sx1268.rx_continuous = dev->rx_continuous_cfg;
+
     return is_free;
 }
 
@@ -269,6 +441,8 @@ uint32_t Radio_GetRandom(radio_t *dev) {
     uint32_t rnd = SX1268_GetRandomHardware(&dev->sx1268);
 
     Radio_Standby(dev);
+    dev->sx1268.rx_continuous = dev->rx_continuous_cfg;
+
     return rnd;
 }
 
@@ -277,6 +451,7 @@ bool Radio_IsDio1High(const radio_t *dev) {
     if((dev == NULL) || (dev->sx1268.dio1_port == NULL)) {
         return false;
     }
+
     return (HAL_GPIO_ReadPin(dev->sx1268.dio1_port, dev->sx1268.dio1_pin) == GPIO_PIN_SET);
 }
 
@@ -301,12 +476,28 @@ bool Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size) {
 
 // Start packet reception with standard power-saving LNA gain
 void Radio_Receive(radio_t *dev, uint32_t timeout_ms) {
+	if(dev == NULL) {
+		return;
+	}
+
     Radio_StartRxInternal(dev, timeout_ms, false);
 }
 
 // Start packet reception with maximum Boosted LNA sensitivity
 void Radio_ReceiveBoosted(radio_t *dev, uint32_t timeout_ms) {
+	if(dev == NULL) {
+		return;
+	}
+
     Radio_StartRxInternal(dev, timeout_ms, true);
+}
+
+void Radio_ReceiveAdaptive(radio_t *dev, uint32_t timeout_ms) {
+    if(dev == NULL) {
+        return;
+    }
+
+    Radio_StartRxInternal(dev, timeout_ms, dev->rx_boosted);
 }
 
 // Start a LoRa Channel Activity Detection scan
@@ -334,13 +525,14 @@ void Radio_SetRxDutyCycle(radio_t *dev, uint32_t rx_time_ms, uint32_t sleep_time
     uint32_t sleep_steps = RADIO_MS_TO_RTC_STEPS(sleep_time_ms);
 
     dev->state = RADIO_STATE_RX_RUNNING;
+    dev->sx1268.rx_continuous = false;
     SX1268_SetRxDutyCycle(&dev->sx1268, rx_steps, sleep_steps);
 }
 
 // Transmit an unmodulated continuous wave carrier (RF bench testing)
 void Radio_SetTxContinuousWave(radio_t *dev, uint32_t freq_hz, int8_t power_dbm) {
     SX1268_SetRfFrequency(&dev->sx1268, freq_hz);
-    SX1268_SetTxParams(&dev->sx1268, power_dbm, SX1268_RAMP_200_US);
+    Radio_SetTxPower(dev, power_dbm);
 
     dev->state = RADIO_STATE_TX_RUNNING;
     SX1268_SetTxContinuousWave(&dev->sx1268);
@@ -362,6 +554,7 @@ void Radio_Standby(radio_t *dev) {
 int8_t Radio_GetRssiInstant(radio_t *dev) {
     return SX1268_GetRssiInstant(&dev->sx1268);
 }
+
 
 void Radio_OnDio1Irq(radio_t *dev) {
     dev->irq_fired = true;

@@ -58,7 +58,39 @@ const osThreadAttr_t defaultTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
+const radio_lora_config_t radio_cfg_dev = {
+    .freq_hz        = 433920000UL,					// 433.92MHz
+    .tx_power_dbm   = SX1268_TX_PWR_24DBM_SETPOINT, // 24dBm -> dynamically adjusted
+    .sf             = SX1268_LORA_SF7,             	// SF7
+    .bw             = SX1268_LORA_BW_125,          	// 125kHz
+    .cr             = SX1268_LORA_CR_4_5,          	// 4/5
+    .preamble_len   = 8U,                          	// 8 symbols
+    .symb_timeout   = 0U,                          	// Disable in rx continuous
+    .fixed_len      = false,                       	// Explicit Header
+    .payload_len    = RADIO_MAX_PAYLOAD_LENGTH,    	// 255 bytes
+    .crc_on         = true,                        	// CRC
+    .invert_iq      = false,                       	// Default polarity
+    .public_network = false,                       	// Private SyncWord
+    .rx_continuous  = true,                        	// Always listen
+    .rx_boosted     = true,                        	// LNA boosted -> dynamically adjusted
+    .tx_timeout_ms  = 1500U                        	// Watchdog hardware Tx
+};
 
+static radio_t radio_dev = {
+		.sx1268 = {
+				.hspi = &hspi1,
+				.nss_port  = LORA_SPI1_NSS_GPIO_Port,
+				.nss_pin   = LORA_SPI1_NSS_Pin,
+				.busy_port = LORA_BUSY_GPIO_Port,
+				.busy_pin  = LORA_BUSY_Pin,
+				.nrst_port = LORA_nRST_GPIO_Port,
+				.nrst_pin  = LORA_nRST_Pin,
+				.rxen_port = LORA_RXEN_GPIO_Port,
+				.rxen_pin  = LORA_RXEN_Pin,
+				.dio1_port = LORA_INT_GPIO_Port,
+				.dio1_pin  = LORA_INT_Pin
+		}
+};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

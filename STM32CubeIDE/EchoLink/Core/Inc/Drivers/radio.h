@@ -13,6 +13,24 @@
 #define RADIO_RECEIVE_CONTINUOUS_TIMEOUT    0xFFFFFFUL
 #define RADIO_TX_SINGLE_NO_TIMEOUT          0x000000UL
 
+// Tx threshold
+#define RADIO_TPC_RSSI_CRITICAL_DBM     	(-112)
+#define RADIO_TPC_RSSI_LOW_DBM          	(-100)
+#define RADIO_TPC_RSSI_HIGH_DBM         	(-82)
+#define RADIO_TPC_RSSI_SATURATION_DBM   	(-45)
+
+#define RADIO_TPC_SNR_MARGIN_CRIT_DB    	(5)
+#define RADIO_TPC_SNR_MARGIN_LOW_DB     	(10)
+#define RADIO_TPC_SNR_MARGIN_HIGH_DB    	(18)
+
+// Rx threshold
+#define RADIO_RX_BOOST_ON_RSSI_DBM        	(-95)
+#define RADIO_RX_BOOST_OFF_RSSI_DBM         (-78)
+
+#define RADIO_RX_BOOST_ON_SNR_MARGIN_DB     (10)
+#define RADIO_RX_BOOST_OFF_SNR_MARGIN_DB    (18)
+
+
 /* Radio state machine */
 typedef enum {
     RADIO_STATE_IDLE = 0,
@@ -34,7 +52,9 @@ typedef struct {
     uint8_t                 payload_len;
     bool                    crc_on;
     bool                    invert_iq;
+    bool                    public_network;
     bool                    rx_continuous;
+    bool                    rx_boosted;
     uint32_t                tx_timeout_ms;
 } radio_lora_config_t;
 
@@ -50,11 +70,14 @@ typedef struct {
 
 /* Main instance structure */
 typedef struct {
-    sx1268_t            	sx1268;
+    sx1268_t                sx1268;
     radio_events_t          events;
     volatile radio_state_t  state;
     volatile bool           irq_fired;
     uint32_t                tx_timeout_ms;
+    int8_t                  tx_power_dbm;
+    bool                    rx_continuous_cfg;
+    bool                    rx_boosted;
     bool                    cad_pending_after_rx;
     uint8_t                 rx_buffer[RADIO_MAX_PAYLOAD_LENGTH];
 } radio_t;
@@ -71,6 +94,11 @@ void Radio_SetTxPower(radio_t *dev, int8_t power_dbm);
 void Radio_SetPublicNetwork(radio_t *dev, bool is_public);
 void Radio_SetMaxPayloadLength(radio_t *dev, uint8_t max_len);
 
+int8_t Radio_ComputeAdaptiveTxPower(radio_t *dev, int8_t current_setpoint_dbm, int8_t rssi_dbm, int8_t snr_db);
+bool Radio_ComputeAdaptiveRxBoost(radio_t *dev, bool current_boosted, int8_t rssi_dbm, int8_t snr_db);
+int8_t Radio_AdjustTxPower(radio_t *dev, int8_t rssi_dbm, int8_t snr_db);
+bool Radio_AdjustRxBoost(radio_t *dev, int8_t rssi_dbm, int8_t snr_db);
+
 bool Radio_CheckRfFrequency(uint32_t freq_hz);
 uint32_t Radio_GetTimeOnAir(const radio_t *dev, uint8_t pkt_len);
 uint32_t Radio_GetWakeupTime(void);
@@ -82,6 +110,7 @@ bool Radio_IsDio1High(const radio_t *dev);
 bool Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size);
 void Radio_Receive(radio_t *dev, uint32_t timeout_ms);
 void Radio_ReceiveBoosted(radio_t *dev, uint32_t timeout_ms);
+void Radio_ReceiveAdaptive(radio_t *dev, uint32_t timeout_ms);
 void Radio_StartCad(radio_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t rx_timeout_ms);
 void Radio_SetRxDutyCycle(radio_t *dev, uint32_t rx_time_ms, uint32_t sleep_time_ms);
 void Radio_SetTxContinuousWave(radio_t *dev, uint32_t freq_hz, int8_t power_dbm);
