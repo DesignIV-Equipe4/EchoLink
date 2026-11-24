@@ -2,14 +2,14 @@
 #include <stddef.h>
 
 
-#define ISOW1044_PWRUP_TIME_MS (6U)
+#define ISOW1044_PWRUP_TIME_MS 			(6U)
+//#define ISOW1044_DEFAULT_LOCAL_NODE_ID 	(1U)
 
 
 isow1044_error_t ISOW1044_Init(isow1044_t *dev) {
     if(dev == NULL || dev->hcan == NULL) {
         return ISOW1044_ERROR_DEV;
     }
-
 
     ISOW1044_EnableDcdc(dev, dev->dcdc_on);
 
@@ -20,6 +20,8 @@ isow1044_error_t ISOW1044_Init(isow1044_t *dev) {
     }
 
     ISOW1044_SetMode(dev, dev->mode);
+
+    ISOW1044_SetNodeId(dev, dev->local_node_id);
 
     CAN_FilterTypeDef can_filter 	= {0};
     can_filter.FilterBank           = 0;
@@ -46,6 +48,8 @@ isow1044_error_t ISOW1044_Init(isow1044_t *dev) {
 
 
 void ISOW1044_SetMode(isow1044_t *dev, isow1044_mode_t mode) {
+	if(mode >= ISOW1044_MODE_MAX || mode < ISOW1044_MODE_NORMAL) return;
+
     if(mode == ISOW1044_MODE_NORMAL) {
         HAL_GPIO_WritePin(dev->stb_port, dev->stb_pin, GPIO_PIN_RESET);
     } else {
@@ -58,17 +62,20 @@ void ISOW1044_SetMode(isow1044_t *dev, isow1044_mode_t mode) {
 
 void ISOW1044_EnableDcdc(isow1044_t *dev, bool enable) {
     if(enable) {
-        HAL_GPIO_WritePin(dev->en_flt_port, dev->en_flt_pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(dev->en_fnc_port, dev->en_fnc_pin, GPIO_PIN_SET);
     } else {
-        HAL_GPIO_WritePin(dev->en_flt_port, dev->en_flt_pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(dev->en_fnc_port, dev->en_fnc_pin, GPIO_PIN_RESET);
     }
 }
 
 
 bool ISOW1044_IsFaultActive(isow1044_t *dev) {
-	return (HAL_GPIO_ReadPin(dev->en_flt_port, dev->en_flt_pin) == GPIO_PIN_RESET);
+	return (HAL_GPIO_ReadPin(dev->en_fnc_port, dev->en_fnc_pin) == GPIO_PIN_RESET);
 }
 
+void ISOW1044_SetNodeId(isow1044_t *dev, uint8_t id) {
+	dev->local_node_id = id;
+}
 
 HAL_StatusTypeDef ISOW1044_SendCommand(isow1044_t *dev, uint32_t std_id, uint8_t *tx_data, uint8_t length) {
 	if(tx_data == NULL) {

@@ -3552,9 +3552,9 @@
 		)
 		(uuid "aa74cefd-db4a-4037-a137-89a1d671df29")
 	)
-	(text "Module Option"
+	(text "Reset Option"
 		(exclude_from_sim no)
-		(at 28.956 130.81 0)
+		(at 27.686 130.556 0)
 		(effects
 			(font
 				(size 2.54 2.54)

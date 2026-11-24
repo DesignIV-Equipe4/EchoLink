@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Drivers/radio.h"
+#include "Drivers/isow1044.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,6 +59,7 @@ const osThreadAttr_t defaultTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
+
 const radio_lora_config_t radio_cfg_dev = {
     .freq_hz        = 433920000UL,					// 433.92MHz
     .tx_power_dbm   = SX1268_TX_PWR_24DBM_SETPOINT, // 24dBm -> dynamically adjusted
@@ -91,6 +93,18 @@ static radio_t radio_dev = {
 				.dio1_pin  = LORA_INT_Pin
 		}
 };
+
+isow1044_t isow1044_dev = {
+		.hcan = &hcan1,
+		.stb_port = ISO_STB_GPIO_Port,
+		.stb_pin = ISO_STB_Pin,
+		.en_fnc_port = ISO_FNC_GPIO_Port,
+		.en_fnc_pin = ISO_FNC_Pin,
+		.dcdc_on = false,
+		.mode = ISOW1044_MODE_NORMAL,
+		.local_node_id = 1U
+};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -147,7 +161,7 @@ int main(void)
   MX_LPTIM1_Init();
   MX_LPTIM2_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_LPTIM_PWM_Start(&hlptim2, 47999, 16000); // 0.5s on - 1s off
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -485,12 +499,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PWR_SPEED_Pin */
-  GPIO_InitStruct.Pin = PWR_SPEED_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(PWR_SPEED_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

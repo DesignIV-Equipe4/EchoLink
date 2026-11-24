@@ -87,8 +87,6 @@ void Error_Handler(void);
 #define BMS_LPUART1_RX_GPIO_Port GPIOB
 #define BMS_LPUART1_TX_Pin GPIO_PIN_11
 #define BMS_LPUART1_TX_GPIO_Port GPIOB
-#define PWR_SPEED_Pin GPIO_PIN_15
-#define PWR_SPEED_GPIO_Port GPIOB
 #define PWR_LPTIM2_OUT_Pin GPIO_PIN_8
 #define PWR_LPTIM2_OUT_GPIO_Port GPIOA
 #define PWR_IO1_Pin GPIO_PIN_9

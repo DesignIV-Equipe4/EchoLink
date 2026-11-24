@@ -22,8 +22,8 @@ typedef struct {
     CAN_HandleTypeDef 	*hcan;
     GPIO_TypeDef      	*stb_port;
     uint16_t           	stb_pin;
-    GPIO_TypeDef      	*en_flt_port;
-    uint16_t           	en_flt_pin;
+    GPIO_TypeDef      	*en_fnc_port;
+    uint16_t           	en_fnc_pin;
 
     uint8_t            	local_node_id;
     isow1044_mode_t		mode;
@@ -35,6 +35,7 @@ isow1044_error_t ISOW1044_Init(isow1044_t *dev);
 void ISOW1044_SetMode(isow1044_t *dev, isow1044_mode_t mode);
 void ISOW1044_EnableDcdc(isow1044_t *dev, bool enable);
 bool ISOW1044_IsFaultActive(isow1044_t *dev);
+void ISOW1044_SetNodeId(isow1044_t *dev, uint8_t id);
 
 HAL_StatusTypeDef ISOW1044_SendCommand(isow1044_t *dev, uint32_t std_id, uint8_t *tx_data, uint8_t length);
 
