@@ -263,6 +263,21 @@ void SX1268_CheckDeviceReady(sx1268_t *dev) {
     SX1268_WaitOnBusy(dev);
 }
 
+uint8_t SX1268_GetStatus(sx1268_t *dev) {
+    uint8_t header[2] = { SX1268_CMD_GET_STATUS, 0x00U };
+    uint8_t rx_data[2]  = { 0x0U,  0x0U };
+
+    SX1268_CheckDeviceReady(dev);
+
+    SX1268_NssLow(dev);
+    HAL_SPI_TransmitReceive(dev->hspi, header, rx_data, 2U, SX1268_SPI_TIMEOUT_MS);
+    SX1268_NssHigh(dev);
+
+    SX1268_WaitOnBusy(dev);
+
+    return rx_data[1];
+}
+
 // Put the radio into low-power Sleep mode
 void SX1268_SetSleep(sx1268_t *dev, bool warm_start) {
     // Turn off external LNA (RXEN = 0, TXEN = 0 -> RF switch in CLOSE state)

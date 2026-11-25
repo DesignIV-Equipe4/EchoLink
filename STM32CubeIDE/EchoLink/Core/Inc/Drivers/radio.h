@@ -85,7 +85,8 @@ typedef struct {
 
 /* Prototypes */
 bool Radio_Init(radio_t *dev, const radio_events_t *events);
-radio_state_t Radio_GetStatus(const radio_t *dev);
+radio_state_t Radio_GetStatus(radio_t *dev);
+bool Radio_IsCommunicatingMcu(radio_t *dev);
 bool Radio_WakeupInit(radio_t *dev, const radio_events_t *events, const radio_lora_config_t *cfg);
 
 bool Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg);
@@ -100,12 +101,12 @@ int8_t Radio_AdjustTxPower(radio_t *dev, int8_t rssi_dbm, int8_t snr_db);
 bool Radio_AdjustRxBoost(radio_t *dev, int8_t rssi_dbm, int8_t snr_db);
 
 bool Radio_CheckRfFrequency(uint32_t freq_hz);
-uint32_t Radio_GetTimeOnAir(const radio_t *dev, uint8_t pkt_len);
+uint32_t Radio_GetTimeOnAir(radio_t *dev, uint8_t pkt_len);
 uint32_t Radio_GetWakeupTime(void);
 
 bool Radio_IsChannelFree(radio_t *dev, uint32_t freq_hz, int16_t rssi_thresh_dbm, uint32_t carrier_sense_time_ms);
 uint32_t Radio_GetRandom(radio_t *dev);
-bool Radio_IsDio1High(const radio_t *dev);
+bool Radio_IsDio1High(radio_t *dev);
 
 bool Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size);
 void Radio_Receive(radio_t *dev, uint32_t timeout_ms);

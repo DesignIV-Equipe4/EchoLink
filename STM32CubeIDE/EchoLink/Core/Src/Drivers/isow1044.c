@@ -15,9 +15,11 @@ isow1044_error_t ISOW1044_Init(isow1044_t *dev) {
 
     HAL_Delay(ISOW1044_PWRUP_TIME_MS);
 
+    /*
     if(ISOW1044_IsFaultActive(dev)) {
         return ISOW1044_ERROR_DEV;
     }
+    */
 
     ISOW1044_SetMode(dev, dev->mode);
 

@@ -157,6 +157,10 @@ bool Radio_Init(radio_t *dev, const radio_events_t *events) {
 	dev->rx_boosted           = true;
 	dev->cad_pending_after_rx = false;
 
+	if(!Radio_IsCommunicatingMcu(dev)) {
+		return false;
+	}
+
     if(!SX1268_Init(&dev->sx1268)) {
         return false;
     }
@@ -169,8 +173,20 @@ bool Radio_Init(radio_t *dev, const radio_events_t *events) {
     return true;
 }
 
-radio_state_t Radio_GetStatus(const radio_t *dev) {
+radio_state_t Radio_GetStatus(radio_t *dev) {
     return dev->state;
+}
+
+bool Radio_IsCommunicatingMcu(radio_t *dev) {
+	uint8_t status = SX1268_GetStatus(&dev->sx1268);
+	bool is_communicating = false;
+	if(status == 0x22 || status == 0x2A) {
+		is_communicating = true;
+	} else if(status == 0x00 || status == 0xFF) {
+		is_communicating = false;
+	}
+
+	return is_communicating;
 }
 
 // Hot-start initialization and restores STM32 context on sys_wkup pin
@@ -387,7 +403,7 @@ bool Radio_CheckRfFrequency(uint32_t freq_hz) {
 }
 
 // Calculate packet Time-on-Air
-uint32_t Radio_GetTimeOnAir(const radio_t *dev, uint8_t pkt_len) {
+uint32_t Radio_GetTimeOnAir(radio_t *dev, uint8_t pkt_len) {
     return SX1268_GetLoraTimeOnAir(&dev->sx1268, pkt_len);
 }
 
@@ -447,7 +463,7 @@ uint32_t Radio_GetRandom(radio_t *dev) {
 }
 
 // Check if the physical DIO1
-bool Radio_IsDio1High(const radio_t *dev) {
+bool Radio_IsDio1High(radio_t *dev) {
     if((dev == NULL) || (dev->sx1268.dio1_port == NULL)) {
         return false;
     }

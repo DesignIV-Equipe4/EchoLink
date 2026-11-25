@@ -61,7 +61,7 @@ const osThreadAttr_t defaultTask_attributes = {
 /* USER CODE BEGIN PV */
 
 const radio_lora_config_t radio_cfg_dev = {
-    .freq_hz        = 433920000UL,					// 433.92MHz
+    .freq_hz        = 466400000UL,					// 433.92MHz
     .tx_power_dbm   = SX1268_TX_PWR_24DBM_SETPOINT, // 24dBm -> dynamically adjusted
     .sf             = SX1268_LORA_SF7,             	// SF7
     .bw             = SX1268_LORA_BW_125,          	// 125kHz
@@ -93,6 +93,7 @@ static radio_t radio_dev = {
 				.dio1_pin  = LORA_INT_Pin
 		}
 };
+radio_events_t radio_events_dev;
 
 isow1044_t isow1044_dev = {
 		.hcan = &hcan1,
@@ -161,7 +162,15 @@ int main(void)
   MX_LPTIM1_Init();
   MX_LPTIM2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_LPTIM_PWM_Start(&hlptim2, 47999, 16000); // 0.5s on - 1s off
+  HAL_LPTIM_PWM_Start(&hlptim2, 47999, 16000); // 1s on - 0.5s off
+  //GPIO_PinState state1 = HAL_GPIO_ReadPin(SYS_FNC_GPIO_Port, SYS_FNC_Pin); // Button function
+  //GPIO_PinState state2 = HAL_GPIO_ReadPin(MOD_OPT_GPIO_Port, MOD_OPT_Pin); // Module option
+  //ISOW1044_Init(&isow1044_dev);
+  //uint8_t test_data_can = 0b10101010;
+  //ISOW1044_SendCommand(&isow1044_dev, 2U, &test_data_can, sizeof(test_data_can));
+  Radio_Init(&radio_dev, &radio_events_dev);
+  int8_t rssi = Radio_GetRssiInstant(&radio_dev);
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -422,7 +431,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_64;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -493,12 +502,19 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(LORA_BUSY_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LORA_RXEN_Pin ISO_FNC_Pin ISO_STB_Pin */
-  GPIO_InitStruct.Pin = LORA_RXEN_Pin|ISO_FNC_Pin|ISO_STB_Pin;
+  /*Configure GPIO pins : LORA_RXEN_Pin ISO_STB_Pin */
+  GPIO_InitStruct.Pin = LORA_RXEN_Pin|ISO_STB_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ISO_FNC_Pin */
+  GPIO_InitStruct.Pin = ISO_FNC_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(ISO_FNC_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
