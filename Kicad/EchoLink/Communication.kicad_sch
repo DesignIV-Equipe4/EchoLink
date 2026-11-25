@@ -4166,6 +4166,19 @@
 		)
 		(uuid "794e094b-694d-49c7-b236-b5e13e334dde")
 	)
+	(text "Inverser TXD/RXD"
+		(exclude_from_sim no)
+		(at 160.02 132.334 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "7e272737-423a-48a8-b764-9ff0e4937b5a")
+	)
 	(text "STB -> GND : Normal mode\nEN/FLT floating : DC-DC enabled \nwith an internal pull-up"
 		(exclude_from_sim no)
 		(at 119.38 101.092 0)
@@ -4199,6 +4212,19 @@
 			)
 		)
 		(uuid "96b9186f-8da1-42ea-b970-c94db5ffc905")
+	)
+	(text "Revoir ISO_FNC"
+		(exclude_from_sim no)
+		(at 162.306 138.43 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "d115fb6c-2f79-44ec-b062-68d2866d8a9c")
 	)
 	(text "Active LOW"
 		(exclude_from_sim no)
