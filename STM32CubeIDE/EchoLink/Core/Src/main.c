@@ -163,13 +163,6 @@ int main(void)
   MX_LPTIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_LPTIM_PWM_Start(&hlptim2, 47999, 16000); // 1s on - 0.5s off
-  //GPIO_PinState state1 = HAL_GPIO_ReadPin(SYS_FNC_GPIO_Port, SYS_FNC_Pin); // Button function
-  //GPIO_PinState state2 = HAL_GPIO_ReadPin(MOD_OPT_GPIO_Port, MOD_OPT_Pin); // Module option
-  //ISOW1044_Init(&isow1044_dev);
-  //uint8_t test_data_can = 0b10101010;
-  //ISOW1044_SendCommand(&isow1044_dev, 2U, &test_data_can, sizeof(test_data_can));
-  Radio_Init(&radio_dev, &radio_events_dev);
-  int8_t rssi = Radio_GetRssiInstant(&radio_dev);
 
   /* USER CODE END 2 */
 

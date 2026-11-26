@@ -1,186 +1,376 @@
 #include "Drivers/sx1268.h"
 #include <stddef.h>
+#include <string.h>
 
+
+static sx1268_err_t SX1268_DecodeStatus(uint8_t status) {
+    if((status == 0x00U) || (status == 0xFFU)) {
+        return SX1268_ERR_SPI_COMM;
+    }
+
+    uint8_t chip_mode = (uint8_t)((status & SX1268_STATUS_MODE_MASK) >> SX1268_STATUS_MODE_SHIFT);
+    if((chip_mode < SX1268_CHIP_MODE_STDBY_RC) || (chip_mode > SX1268_CHIP_MODE_TX)) {
+        return SX1268_ERR_SPI_COMM;
+    }
+
+    uint8_t cmd_status = (uint8_t)((status & SX1268_STATUS_CMD_MASK) >> SX1268_STATUS_CMD_SHIFT);
+    switch(cmd_status) {
+        case SX1268_CMD_STATUS_TIMEOUT:
+        	return SX1268_ERR_CMD_TIMEOUT;
+        case SX1268_CMD_STATUS_PROC_ERR:
+        	return SX1268_ERR_CMD_PROC;
+        case SX1268_CMD_STATUS_EXEC_FAIL:
+        	return SX1268_ERR_CMD_EXEC;
+        default:
+        	return SX1268_OK;
+    }
+}
+
+static sx1268_err_t SX1268_DecodeOpErrors(uint16_t op_errors) {
+    if((op_errors & SX1268_OP_ERR_XOSC_START) != 0U) {
+        return SX1268_ERR_XOSC_START;
+    }
+    if((op_errors & SX1268_OP_ERR_IMG_CALIB) != 0U) {
+        return SX1268_ERR_IMG_CALIB_FAILED;
+    }
+    if((op_errors & (SX1268_OP_ERR_RC64K_CALIB | SX1268_OP_ERR_RC13M_CALIB | SX1268_OP_ERR_PLL_CALIB   | SX1268_OP_ERR_ADC_CALIB)) != 0U) {
+        return SX1268_ERR_CALIB_FAILED;
+    }
+    if((op_errors & SX1268_OP_ERR_PLL_LOCK) != 0U) {
+        return SX1268_ERR_PLL_LOCK;
+    }
+    if((op_errors & SX1268_OP_ERR_PA_RAMP) != 0U) {
+        return SX1268_ERR_PA_RAMP;
+    }
+
+    return SX1268_OK;
+}
 
 static inline void SX1268_NssLow(sx1268_t *dev) {
-    HAL_GPIO_WritePin(dev->nss_port, dev->nss_pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(dev->nss_port, dev->nss_pin, GPIO_PIN_RESET);
 }
 
 static inline void SX1268_NssHigh(sx1268_t *dev) {
-    HAL_GPIO_WritePin(dev->nss_port, dev->nss_pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(dev->nss_port, dev->nss_pin, GPIO_PIN_SET);
 }
 
-static bool SX1268_WaitOnBusy(sx1268_t *dev) {
+static inline void SX1268_SetRxEnPin(sx1268_t *dev, bool enable) {
+	HAL_GPIO_WritePin(dev->rxen_port, dev->rxen_pin, enable ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+static sx1268_err_t SX1268_WaitOnBusy(sx1268_t *dev) {
     uint32_t start_tick = HAL_GetTick();
     while(HAL_GPIO_ReadPin(dev->busy_port, dev->busy_pin) == GPIO_PIN_SET) {
         if((HAL_GetTick() - start_tick) >= SX1268_BUSY_TIMEOUT_MS) {
-            return false; // Hardware fault or radio unresponsive
+            return SX1268_ERR_BUSY_TIMEOUT; // Hardware fault or radio unresponsive
         }
     }
-    return true;
+
+    return SX1268_OK;
 }
 
-static void SX1268_SpiWriteCmd(sx1268_t *dev, sx1268_cmd_t cmd, const uint8_t *buf, uint16_t len) {
+static sx1268_err_t SX1268_SpiWriteCmd(sx1268_t *dev, sx1268_cmd_t cmd, const uint8_t *buf, uint16_t len) {
+	sx1268_err_t err = SX1268_CheckDeviceReady(dev);
+	if(err != SX1268_OK) {
+		return err;
+	}
+
     uint8_t opcode = (uint8_t)cmd;
+    uint8_t rx_dummy = 0U;
 
-    SX1268_CheckDeviceReady(dev);
     SX1268_NssLow(dev);
-    HAL_SPI_Transmit(dev->hspi, &opcode, 1U, SX1268_SPI_TIMEOUT_MS);
+    if(HAL_SPI_TransmitReceive(dev->hspi, &opcode, &rx_dummy, 1U, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+		SX1268_NssHigh(dev);
+
+		return SX1268_ERR_SPI_TX;
+	}
+
     if((buf != NULL) && (len > 0U)) {
-        HAL_SPI_Transmit(dev->hspi, (uint8_t *)buf, len, SX1268_SPI_TIMEOUT_MS);
+		uint8_t first_status = 0U;
+		if(HAL_SPI_TransmitReceive(dev->hspi, (uint8_t *)&buf[0], &first_status, 1U, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+			SX1268_NssHigh(dev);
+			return SX1268_ERR_SPI_TX;
+		}
+		if(len > 1U) {
+			if(HAL_SPI_Transmit(dev->hspi, (uint8_t *)&buf[1], (uint16_t)(len - 1U), SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+				SX1268_NssHigh(dev);
+				return SX1268_ERR_SPI_TX;
+			}
+		}
+		SX1268_NssHigh(dev);
+
+		err = SX1268_DecodeStatus(first_status);
+		if(err != SX1268_OK) {
+			return err;
+		}
+	} else {
+		SX1268_NssHigh(dev);
+	}
+
+	if(cmd != SX1268_CMD_SET_SLEEP) {
+		return SX1268_WaitOnBusy(dev);
+	}
+
+	return SX1268_OK;
+}
+
+static sx1268_err_t SX1268_SpiReadCmd(sx1268_t *dev, sx1268_cmd_t cmd, uint8_t *buf, uint16_t len) {
+    sx1268_err_t err = SX1268_CheckDeviceReady(dev);
+    if(err != SX1268_OK) {
+        return err;
+    }
+
+    uint8_t tx_hdr[2] = { (uint8_t)cmd, 0x00U };
+    uint8_t rx_hdr[2] = { 0U, 0U };
+
+    SX1268_NssLow(dev);
+    if(HAL_SPI_TransmitReceive(dev->hspi, tx_hdr, rx_hdr, 2U, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+        SX1268_NssHigh(dev);
+        return SX1268_ERR_SPI_TX;
+    }
+
+    if((buf != NULL) && (len > 0U)) {
+        if(HAL_SPI_Receive(dev->hspi, buf, len, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+            SX1268_NssHigh(dev);
+            return SX1268_ERR_SPI_RX;
+        }
     }
     SX1268_NssHigh(dev);
 
-    if(cmd != SX1268_CMD_SET_SLEEP) {
-        SX1268_WaitOnBusy(dev);
+    err = SX1268_DecodeStatus(rx_hdr[1]);
+    if(err != SX1268_OK) {
+        return err;
     }
+
+    return SX1268_WaitOnBusy(dev);
 }
 
-static void SX1268_SpiReadCmd(sx1268_t *dev, sx1268_cmd_t cmd, uint8_t *buf, uint16_t len) {
-    uint8_t header[2] = { (uint8_t)cmd, 0x00U }; // Opcode + 1 NOP byte for status
-
-    SX1268_CheckDeviceReady(dev);
-    SX1268_NssLow(dev);
-    HAL_SPI_Transmit(dev->hspi, header, 2U, SX1268_SPI_TIMEOUT_MS);
-    if((buf != NULL) && (len > 0U)) {
-        HAL_SPI_Receive(dev->hspi, buf, len, SX1268_SPI_TIMEOUT_MS);
+static sx1268_err_t SX1268_SpiWriteReg(sx1268_t *dev, uint16_t addr, const uint8_t *buf, uint16_t len) {
+    sx1268_err_t err = SX1268_CheckDeviceReady(dev);
+    if(err != SX1268_OK) {
+        return err;
     }
-    SX1268_NssHigh(dev);
-    SX1268_WaitOnBusy(dev);
-}
 
-static void SX1268_SpiWriteReg(sx1268_t *dev, uint16_t addr, const uint8_t *buf, uint16_t len) {
-    uint8_t header[3] = {
+    uint8_t tx_hdr[3] = {
         (uint8_t)SX1268_CMD_WRITE_REGISTER,
         (uint8_t)((addr >> 8U) & 0xFFU),
         (uint8_t)(addr & 0xFFU)
     };
+    uint8_t rx_hdr[3] = { 0U };
 
-    SX1268_CheckDeviceReady(dev);
     SX1268_NssLow(dev);
-    HAL_SPI_Transmit(dev->hspi, header, 3U, SX1268_SPI_TIMEOUT_MS);
+    if(HAL_SPI_TransmitReceive(dev->hspi, tx_hdr, rx_hdr, 3U, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+        SX1268_NssHigh(dev);
+        return SX1268_ERR_SPI_TX;
+    }
     if((buf != NULL) && (len > 0U)) {
-        HAL_SPI_Transmit(dev->hspi, (uint8_t *)buf, len, SX1268_SPI_TIMEOUT_MS);
+        if(HAL_SPI_Transmit(dev->hspi, (uint8_t *)buf, len, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+            SX1268_NssHigh(dev);
+            return SX1268_ERR_SPI_TX;
+        }
     }
     SX1268_NssHigh(dev);
-    SX1268_WaitOnBusy(dev);
+
+    err = SX1268_DecodeStatus(rx_hdr[1]);
+    if(err != SX1268_OK) {
+        return err;
+    }
+
+    return SX1268_WaitOnBusy(dev);
 }
 
-static void SX1268_SpiReadReg(sx1268_t *dev, uint16_t addr, uint8_t *buf, uint16_t len) {
-    uint8_t header[4] = {
+static sx1268_err_t SX1268_SpiReadReg(sx1268_t *dev, uint16_t addr, uint8_t *buf, uint16_t len) {
+    sx1268_err_t err = SX1268_CheckDeviceReady(dev);
+    if(err != SX1268_OK) {
+        return err;
+    }
+
+    uint8_t tx_hdr[4] = {
         (uint8_t)SX1268_CMD_READ_REGISTER,
         (uint8_t)((addr >> 8U) & 0xFFU),
         (uint8_t)(addr & 0xFFU),
         0x00U // NOP byte
     };
+    uint8_t rx_hdr[4] = { 0U };
 
-    SX1268_CheckDeviceReady(dev);
     SX1268_NssLow(dev);
-    HAL_SPI_Transmit(dev->hspi, header, 4U, SX1268_SPI_TIMEOUT_MS);
+    if(HAL_SPI_TransmitReceive(dev->hspi, tx_hdr, rx_hdr, 4U, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+        SX1268_NssHigh(dev);
+        return SX1268_ERR_SPI_TX;
+    }
     if((buf != NULL) && (len > 0U)) {
-        HAL_SPI_Receive(dev->hspi, buf, len, SX1268_SPI_TIMEOUT_MS);
+        if(HAL_SPI_Receive(dev->hspi, buf, len, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+            SX1268_NssHigh(dev);
+            return SX1268_ERR_SPI_RX;
+        }
     }
     SX1268_NssHigh(dev);
-    SX1268_WaitOnBusy(dev);
+
+    err = SX1268_DecodeStatus(rx_hdr[1]);
+    if(err != SX1268_OK) {
+        return err;
+    }
+
+    return SX1268_WaitOnBusy(dev);
 }
 
-static void SX1268_SpiWriteBuf(sx1268_t *dev, uint8_t offset, const uint8_t *buf, uint8_t len) {
+static sx1268_err_t SX1268_SpiWriteBuf(sx1268_t *dev, uint8_t offset, const uint8_t *buf, uint8_t len) {
     uint8_t header[2] = { (uint8_t)SX1268_CMD_WRITE_BUFFER, offset };
 
-    SX1268_CheckDeviceReady(dev);
+    sx1268_err_t err = SX1268_OK;
+    err = SX1268_CheckDeviceReady(dev);
+    if(err != SX1268_OK) {
+		return err;
+	}
+
     SX1268_NssLow(dev);
-    HAL_SPI_Transmit(dev->hspi, header, 2U, SX1268_SPI_TIMEOUT_MS);
+    if(HAL_SPI_Transmit(dev->hspi, header, 2U, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+    	SX1268_NssHigh(dev);
+    	return SX1268_ERR_SPI_TX;
+    }
     if((buf != NULL) && (len > 0U)) {
-        HAL_SPI_Transmit(dev->hspi, (uint8_t *)buf, len, SX1268_SPI_TIMEOUT_MS);
+        if(HAL_SPI_Transmit(dev->hspi, (uint8_t *)buf, len, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+			SX1268_NssHigh(dev);
+			return SX1268_ERR_SPI_TX;
+        }
     }
     SX1268_NssHigh(dev);
-    SX1268_WaitOnBusy(dev);
+
+    return SX1268_WaitOnBusy(dev);
 }
 
-static void SX1268_SpiReadBuf(sx1268_t *dev, uint8_t offset, uint8_t *buf, uint8_t len) {
+static sx1268_err_t SX1268_SpiReadBuf(sx1268_t *dev, uint8_t offset, uint8_t *buf, uint8_t len) {
     uint8_t header[3] = {
         (uint8_t)SX1268_CMD_READ_BUFFER,
         offset,
         0x00U // NOP byte required before receiving FIFO data
     };
 
-    SX1268_CheckDeviceReady(dev);
+    sx1268_err_t err = SX1268_OK;
+	err = SX1268_CheckDeviceReady(dev);
+	if(err != SX1268_OK) {
+		return err;
+	}
+
     SX1268_NssLow(dev);
-    HAL_SPI_Transmit(dev->hspi, header, 3U, SX1268_SPI_TIMEOUT_MS);
+    if(HAL_SPI_Transmit(dev->hspi, header, 3U, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+    	SX1268_NssHigh(dev);
+    	return SX1268_ERR_SPI_TX;
+    }
     if((buf != NULL) && (len > 0U)) {
-        HAL_SPI_Receive(dev->hspi, buf, len, SX1268_SPI_TIMEOUT_MS);
+        if(HAL_SPI_Receive(dev->hspi, buf, len, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+        	SX1268_NssHigh(dev);
+			return SX1268_ERR_SPI_RX;
+        }
     }
     SX1268_NssHigh(dev);
-    SX1268_WaitOnBusy(dev);
+
+    return SX1268_WaitOnBusy(dev);
 }
 
-static void SX1268_WriteRegByte(sx1268_t *dev, uint16_t addr, uint8_t val) {
-    SX1268_SpiWriteReg(dev, addr, &val, 1U);
-}
+static sx1268_err_t SX1268_WriteRegVerify(sx1268_t *dev, uint16_t addr, const uint8_t *buf, uint16_t len) {
+    if((buf == NULL) || (len == 0U) || (len > 8U)) {
+        return SX1268_ERR_INVALID_PARAM;
+    }
 
-static uint8_t SX1268_ReadRegByte(sx1268_t *dev, uint16_t addr) {
-    uint8_t val = 0U;
-    SX1268_SpiReadReg(dev, addr, &val, 1U);
-    return val;
+    sx1268_err_t err = SX1268_SpiWriteReg(dev, addr, buf, len);
+    if(err != SX1268_OK) {
+        return err;
+    }
+
+    uint8_t read_buffer[8] = { 0U };
+    err = SX1268_SpiReadReg(dev, addr, read_buffer, len);
+    if(err != SX1268_OK) {
+        return err;
+    }
+
+    if(memcmp(buf, read_buffer, len) != 0) {
+        return SX1268_ERR_REG_VERIFY;
+    }
+
+    return SX1268_OK;
 }
 
 /* Modulation quality 500kHz bw */
-static void SX1268_ApplyTxModulationWorkaround(sx1268_t *dev) {
-    uint8_t reg_val = SX1268_ReadRegByte(dev, SX1268_REG_TX_MODULATION);
+static sx1268_err_t SX1268_ApplyTxModulationWorkaround(sx1268_t *dev) {
+    uint8_t reg_val = 0U;
+    sx1268_err_t err = SX1268_SpiReadReg(dev, SX1268_REG_TX_MODULATION, &reg_val, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
+
     if((dev->packet_type == SX1268_PACKET_TYPE_LORA) && (dev->lora_mod.bandwidth == SX1268_LORA_BW_500)) {
         reg_val &= ~0x04U; /* Bit 2 = 0 */
     } else {
         reg_val |= 0x04U; /* Bit 2 = 1 */
     }
 
-    SX1268_WriteRegByte(dev, SX1268_REG_TX_MODULATION, reg_val);
+    return SX1268_WriteRegVerify(dev, SX1268_REG_TX_MODULATION, &reg_val, 1U);
 }
 
 /* PA protection */
-static void SX1268_ApplyPaClampWorkaround(sx1268_t *dev) {
-    uint8_t clamp_cfg = SX1268_ReadRegByte(dev, SX1268_REG_TX_CLAMP_CFG);
+static sx1268_err_t SX1268_ApplyPaClampWorkaround(sx1268_t *dev) {
+	uint8_t clamp_cfg = 0U;
+	sx1268_err_t err = SX1268_SpiReadReg(dev, SX1268_REG_TX_CLAMP_CFG, &clamp_cfg, 1U);
+	if(err != SX1268_OK) {
+		return err;
+	}
     clamp_cfg |= 0x1EU; // Set bits 4:1 to '1111' to optimize PA clamping threshold
-    SX1268_WriteRegByte(dev, SX1268_REG_TX_CLAMP_CFG, clamp_cfg);
+
+    return SX1268_WriteRegVerify(dev, SX1268_REG_TX_CLAMP_CFG, &clamp_cfg, 1U);
 }
 
-/* Stopping RTC counter after RX */
-static void SX1268_ApplyRtcTimeoutWorkaround(sx1268_t *dev) {
+// Stopping RTC counter after RX
+/* TODO: verify execution, if fail:
+ * replace 0x00 by &zero = 0x00
+ */
+static sx1268_err_t SX1268_ApplyRtcTimeoutWorkaround(sx1268_t *dev) {
+	sx1268_err_t err = SX1268_OK;
     // Write 0x00 to RTC Control to stop the RTC counter
-    SX1268_WriteRegByte(dev, SX1268_REG_RTC_CTRL, 0x00U);
+	err = SX1268_WriteRegVerify(dev, SX1268_REG_RTC_CTRL, 0x00U, 1U);
+	if(err != SX1268_OK) {
+		return err;
+	}
 
-    uint8_t evt_clr = SX1268_ReadRegByte(dev, SX1268_REG_EVT_CLR);
+    uint8_t evt_clr = 0U;
+    err = SX1268_SpiReadReg(dev, SX1268_REG_EVT_CLR, &evt_clr, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
     evt_clr |= 0x02U;   // Set bit 1 to clear any pending RTC timeout event
-    SX1268_WriteRegByte(dev, SX1268_REG_EVT_CLR, evt_clr);
+
+    return SX1268_SpiWriteReg(dev, SX1268_REG_EVT_CLR, &evt_clr, 1U);
 }
 
-/* Inverted IQ polarity */
-static void SX1268_ApplyIqPolarityWorkaround(sx1268_t *dev, sx1268_lora_iq_t iq_mode) {
-    uint8_t iq_reg = SX1268_ReadRegByte(dev, SX1268_REG_IQ_POLARITY);
+// Inverted IQ polarity
+static sx1268_err_t SX1268_ApplyIqPolarityWorkaround(sx1268_t *dev, sx1268_lora_iq_t iq_mode) {
+    uint8_t iq_reg = 0U;
+    sx1268_err_t err = SX1268_SpiReadReg(dev, SX1268_REG_IQ_POLARITY, &iq_reg, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
+
     if(iq_mode == SX1268_LORA_IQ_INVERTED) {
         iq_reg &= (uint8_t)(~0x04U);
     } else {
         iq_reg |= 0x04U;
     }
 
-    SX1268_WriteRegByte(dev, SX1268_REG_IQ_POLARITY, iq_reg);
+    return SX1268_WriteRegVerify(dev, SX1268_REG_IQ_POLARITY, &iq_reg, 1U);
 }
 
-/* Addition of the RxGain */
-static void SX1268_EnableRxGainRetention(sx1268_t *dev) {
-    SX1268_WriteRegByte(dev, SX1268_REG_RETENTION_LIST_0, 0x01U);   // Enable 1 register slot in retention memory (0x029F)
-    SX1268_WriteRegByte(dev, SX1268_REG_RETENTION_LIST_1, 0x08U);   // Store MSB of RxGain register address
-    SX1268_WriteRegByte(dev, SX1268_REG_RETENTION_LIST_2, 0xACU);   // Store LSB of RxGain register address
+// Addition of the RxGain
+static sx1268_err_t SX1268_EnableRxGainRetention(sx1268_t *dev) {
+	const uint8_t buf[3] = {
+			0x01U, 	// Enable 1 register slot in retention memory
+			0x08U, 	// Store MSB of RxGain register address
+			0xACU	// Store LSB of RxGain register address
+	};
+    return SX1268_WriteRegVerify(dev, SX1268_REG_RETENTION_LIST_0, buf, 3U);
 }
 
 
-
-void SX1268_SetRxEnPin(sx1268_t *dev, bool enable) {
-    if(dev->rxen_port != NULL) {
-        HAL_GPIO_WritePin(dev->rxen_port, dev->rxen_pin, enable ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    }
-}
-
-void SX1268_Reset(sx1268_t *dev) {
+sx1268_err_t SX1268_Reset(sx1268_t *dev) {
     // Turn off external LNA before resetting the chip (RXEN = 0)
 	SX1268_SetRxEnPin(dev, false);
 	SX1268_NssHigh(dev);
@@ -191,28 +381,48 @@ void SX1268_Reset(sx1268_t *dev) {
 	HAL_GPIO_WritePin(dev->nrst_port, dev->nrst_pin, GPIO_PIN_SET);
 	HAL_Delay(SX1268_NRST_RC_RISE_DELAY_MS);
 
-	SX1268_WaitOnBusy(dev);
+	sx1268_err_t err = SX1268_WaitOnBusy(dev);
 	dev->op_mode = SX1268_MODE_STDBY_RC;
+
+	return err;
 }
 
-bool SX1268_Init(sx1268_t *dev) {
-	if((dev == NULL) || (dev->hspi == NULL)) {
-		return false;
+sx1268_err_t SX1268_Init(sx1268_t *dev) {
+	if((dev == NULL) || (dev->hspi == NULL) || (dev->rxen_port == NULL) || (dev->nss_port == NULL) || (dev->nrst_port == NULL) || (dev->busy_port == NULL) || (dev->dio1_port == NULL)) {
+		return SX1268_ERR_NULL_PTR;
 	}
 
     dev->image_calibrated = false; // Force image calibration on the first frequency setup
     dev->rx_continuous    = false; // Default to single RX mode
 
+    sx1268_err_t err = SX1268_OK;
     // Hardware reset
-    SX1268_Reset(dev);
-	if(!SX1268_WaitOnBusy(dev)) {
-		return false;
+    err = SX1268_Reset(dev);
+	if(err != SX1268_OK) {
+		return err;
+	}
+
+	err = SX1268_IsCommunicatingMcu(dev);
+	if(err != SX1268_OK) {
+		return err;
+	}
+
+	err = SX1268_WaitOnBusy(dev);
+	if(err != SX1268_OK) {
+		return err;
 	}
 
     // Set Standby RC mode and enable DC-DC buck regulator adjustments
-    SX1268_SetStandby(dev, SX1268_STDBY_RC);
+    err = SX1268_SetStandby(dev, SX1268_STDBY_RC);
+    if(err != SX1268_OK) {
+		return err;
+	}
+
     uint8_t reg_mode = (uint8_t)SX1268_REGULATOR_DCDC;
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_REGULATOR_MODE, &reg_mode, 1U);
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_REGULATOR_MODE, &reg_mode, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // DIO3 configuration for internal TXCO
     uint32_t tcxo_delay_steps = (uint32_t)SX1268_TCXO_SETUP_TIME_MS << 6U;
@@ -222,101 +432,167 @@ bool SX1268_Init(sx1268_t *dev) {
         (uint8_t)((tcxo_delay_steps >> 8U)  & 0xFFU),
         (uint8_t)(tcxo_delay_steps & 0xFFU)
     };
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_TCXO_MODE, tcxo_buf, 4U); // Enable TCXO control on DIO3
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_TCXO_MODE, tcxo_buf, 4U); // Enable TCXO control on DIO3
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // Clear XOSC_START_ERR and calibrate
     uint8_t clr_err_buf[2] = { 0x00U, 0x00U };
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_CLR_DEVICE_ERRORS, clr_err_buf, 2U);
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_CLR_DEVICE_ERRORS, clr_err_buf, 2U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
-    uint8_t calib_all = 0x7FU;                                      // Bitmask 0x7F: calibrate RC64k, RC13M, PLL, ADC, and Image
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_CALIBRATE, &calib_all, 1U); // Start full calibration
+    uint8_t calib_all = 0x7FU;                                      		// Bitmask 0x7F: calibrate RC64k, RC13M, PLL, ADC, and Image
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_CALIBRATE, &calib_all, 1U); 	// Start full calibration
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // DIO2 automatically drive external TXEN
     uint8_t dio2_rf_sw_enable = 0x01U;
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_RF_SWITCH_MODE, &dio2_rf_sw_enable, 1U);
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_RF_SWITCH_MODE, &dio2_rf_sw_enable, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // PA over-voltage clamp fix & set Rx gain
-    SX1268_ApplyPaClampWorkaround(dev);
-    SX1268_EnableRxGainRetention(dev);
+    err = SX1268_ApplyPaClampWorkaround(dev);
+    if(err != SX1268_OK) {
+		return err;
+	}
+    err = SX1268_EnableRxGainRetention(dev);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // Set both TX/RX FIFO buffer base addresses to 0x00 (full 256-bytes range)
     uint8_t base_addr[2] = { 0x00U, 0x00U };
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_BUFFER_BASE_ADDR, base_addr, 2U);
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_BUFFER_BASE_ADDR, base_addr, 2U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // Set Lora packet type
     dev->packet_type = SX1268_PACKET_TYPE_LORA;
     uint8_t pkt_type = (uint8_t)SX1268_PACKET_TYPE_LORA;
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_PACKET_TYPE, &pkt_type, 1U);
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_PACKET_TYPE, &pkt_type, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
-    return true;
+    return SX1268_OK;
 }
 
 // Ensure the radio is awake and ready to accept an SPI command
-void SX1268_CheckDeviceReady(sx1268_t *dev) {
+sx1268_err_t SX1268_CheckDeviceReady(sx1268_t *dev) {
     if((dev->op_mode == SX1268_MODE_SLEEP) || (dev->op_mode == SX1268_MODE_RX_DC)) {
     	SX1268_NssLow(dev);            // Pull NSS low then high to trigger wake-up
-    	SX1268_WaitOnBusy(dev);
+    	sx1268_err_t err = SX1268_WaitOnBusy(dev);
     	SX1268_NssHigh(dev);
+    	if(err != SX1268_OK) {
+			return err;
+		}
         dev->op_mode = SX1268_MODE_STDBY_RC;
     }
 
-    SX1268_WaitOnBusy(dev);
+    return SX1268_WaitOnBusy(dev);
 }
 
-uint8_t SX1268_GetStatus(sx1268_t *dev) {
-    uint8_t header[2] = { SX1268_CMD_GET_STATUS, 0x00U };
-    uint8_t rx_data[2]  = { 0x0U,  0x0U };
+sx1268_err_t SX1268_GetStatus(sx1268_t *dev) {
+    sx1268_err_t err = SX1268_CheckDeviceReady(dev);
+    if(err != SX1268_OK) {
+        return err;
+    }
 
-    SX1268_CheckDeviceReady(dev);
+    uint8_t tx[2] = { (uint8_t)SX1268_CMD_GET_STATUS, 0x00U };
+    uint8_t rx[2] = { 0U, 0U };
 
     SX1268_NssLow(dev);
-    HAL_SPI_TransmitReceive(dev->hspi, header, rx_data, 2U, SX1268_SPI_TIMEOUT_MS);
+    if(HAL_SPI_TransmitReceive(dev->hspi, tx, rx, 2U, SX1268_SPI_TIMEOUT_MS) != HAL_OK) {
+        SX1268_NssHigh(dev);
+        return SX1268_ERR_SPI_TX;
+    }
     SX1268_NssHigh(dev);
 
-    SX1268_WaitOnBusy(dev);
+    return SX1268_DecodeStatus(rx[1]);
+}
 
-    return rx_data[1];
+sx1268_err_t SX1268_GetDeviceErrors(sx1268_t *dev) {
+    uint8_t buf[2] = { 0U, 0U };
+    sx1268_err_t err = SX1268_SpiReadCmd(dev, SX1268_CMD_GET_DEVICE_ERRORS, buf, 2U);
+    if(err != SX1268_OK) {
+        return err;
+    }
+
+    uint16_t op_error = (uint16_t)(((uint16_t)buf[0] << 8U) | buf[1]);
+    return SX1268_DecodeOpErrors(op_error);
+}
+
+sx1268_err_t SX1268_IsCommunicatingMcu(sx1268_t *dev) {
+	// TODO: pair with conditional verifications if/else if (sleep state, run, ect..)
+    return SX1268_GetStatus(dev);
 }
 
 // Put the radio into low-power Sleep mode
-void SX1268_SetSleep(sx1268_t *dev, bool warm_start) {
+sx1268_err_t SX1268_SetSleep(sx1268_t *dev, bool warm_start) {
     // Turn off external LNA (RXEN = 0, TXEN = 0 -> RF switch in CLOSE state)
 	SX1268_SetRxEnPin(dev, false);
 
     uint8_t sleep_cfg = warm_start ? 0x04U : 0x00U; // 0x04 = keep configuration in retention RAM (warm start)
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_SLEEP, &sleep_cfg, 1U);
+    sx1268_err_t err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_SLEEP, &sleep_cfg, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
     dev->op_mode = SX1268_MODE_SLEEP;
 
     HAL_Delay(1U); // // Wait > 500 us for context saving
+
+    return SX1268_OK;
 }
 
 // Put the radio into Standby mode
-void SX1268_SetStandby(sx1268_t *dev, sx1268_standby_mode_t mode) {
+sx1268_err_t SX1268_SetStandby(sx1268_t *dev, sx1268_standby_mode_t mode) {
     // Turn off external LNA (RXEN = 0, TXEN = 0 -> RF switch in CLOSE state)
 	SX1268_SetRxEnPin(dev, false);
 
     uint8_t stdby_cfg = (uint8_t)mode;
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_STANDBY, &stdby_cfg, 1U);
+    sx1268_err_t err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_STANDBY, &stdby_cfg, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     dev->op_mode = (mode == SX1268_STDBY_RC) ? SX1268_MODE_STDBY_RC : SX1268_MODE_STDBY_XOSC;
+
+    return SX1268_OK;
 }
 
 /* Put the radio into frequency synthesis mode (PLL locked, no TX/RX active)
  * Generate and switch communication channels with precised digital acquisition
  */
-void SX1268_SetFS(sx1268_t *dev) {
+sx1268_err_t SX1268_SetFS(sx1268_t *dev) {
     // Turn off external LNA (RXEN = 0, TXEN = 0 -> RF switch in CLOSE state)
 	SX1268_SetRxEnPin(dev, false);
-	SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_FS, NULL, 0U);
+	sx1268_err_t err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_FS, NULL, 0U);
+	if(err != SX1268_OK) {
+		return err;
+	}
 	dev->op_mode = SX1268_MODE_FS;
+
+	return SX1268_OK;
 }
 
 // Start packet transmission
-void SX1268_SetTx(sx1268_t *dev, uint32_t timeout_rtc_steps) {
+sx1268_err_t SX1268_SetTx(sx1268_t *dev, uint32_t timeout_rtc_steps) {
     // Force RXEN = 0 before DIO2 drives TXEN = 1
 	SX1268_SetRxEnPin(dev, false);
 
-    SX1268_ApplyTxModulationWorkaround(dev); // Apply 500kHz modulation fix before transmitting
+	sx1268_err_t err = SX1268_OK;
+	err = SX1268_ApplyTxModulationWorkaround(dev); // Apply 500kHz modulation fix before transmitting
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // Pack 24-bit timeout value (0x000000 = timeout disabled)
     uint8_t buf[3] = {
@@ -325,16 +601,26 @@ void SX1268_SetTx(sx1268_t *dev, uint32_t timeout_rtc_steps) {
         (uint8_t)(timeout_rtc_steps & 0xFFU)
     };
 
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_TX, buf, 3U); // DIO2 automatically sets TXEN = 1 and PA ramps up
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_TX, buf, 3U); // DIO2 automatically sets TXEN = 1 and PA ramps up
+    if(err != SX1268_OK) {
+		return err;
+	}
     dev->op_mode = SX1268_MODE_TX;
+
+    return SX1268_OK;
 }
 
 // Start packet reception with selectable LNA gain
-void SX1268_SetRx(sx1268_t *dev, uint32_t timeout_rtc_steps, bool rx_boosted) {
+sx1268_err_t SX1268_SetRx(sx1268_t *dev, uint32_t timeout_rtc_steps, bool rx_boosted) {
     dev->rx_continuous = (timeout_rtc_steps == 0xFFFFFFUL); // 0xFFFFFF = continuous reception mode
 
+    sx1268_err_t err = SX1268_OK;
+    uint8_t sensitivity = rx_boosted ? SX1268_RX_GAIN_BOOSTED : SX1268_RX_GAIN_POWER_SAVING;
     // 0x96 = max sensitivity (Boosted), 0x94 = lower current
-    SX1268_WriteRegByte(dev, SX1268_REG_RX_GAIN, rx_boosted ? SX1268_RX_GAIN_BOOSTED : SX1268_RX_GAIN_POWER_SAVING);
+    err = SX1268_WriteRegVerify(dev, SX1268_REG_RX_GAIN, &sensitivity, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // Enable external LNA (RXEN = 1, TXEN = 0)
     SX1268_SetRxEnPin(dev, true);
@@ -346,12 +632,18 @@ void SX1268_SetRx(sx1268_t *dev, uint32_t timeout_rtc_steps, bool rx_boosted) {
         (uint8_t)(timeout_rtc_steps & 0xFFU)
     };
 
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_RX, buf, 3U);
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_RX, buf, 3U);
+    if(err != SX1268_OK) {
+    	SX1268_SetRxEnPin(dev, false);
+		return err;
+	}
     dev->op_mode = SX1268_MODE_RX;
+
+    return SX1268_OK;
 }
 
 // Start periodic Rx Duty Cycle (Listen / Sniff mode)
-void SX1268_SetRxDutyCycle(sx1268_t *dev, uint32_t rx_steps, uint32_t sleep_steps) {
+sx1268_err_t SX1268_SetRxDutyCycle(sx1268_t *dev, uint32_t rx_steps, uint32_t sleep_steps) {
     uint8_t buf[6] = {
         (uint8_t)((rx_steps >> 16U)    & 0xFFU),
         (uint8_t)((rx_steps >> 8U)     & 0xFFU),
@@ -362,15 +654,26 @@ void SX1268_SetRxDutyCycle(sx1268_t *dev, uint32_t rx_steps, uint32_t sleep_step
     };
 
     SX1268_SetRxEnPin(dev, true);
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_RX_DUTY_CYCLE, buf, 6U);
+    sx1268_err_t err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_RX_DUTY_CYCLE, buf, 6U);
+    if(err != SX1268_OK) {
+    	SX1268_SetRxEnPin(dev, false);
+		return err;
+	}
     dev->op_mode = SX1268_MODE_RX_DC;
+
+    return SX1268_OK;
 }
 
 // Start unmodulated RF Continuous Wave transmission (test mode)
-void SX1268_SetTxContinuousWave(sx1268_t *dev) {
+sx1268_err_t SX1268_SetTxContinuousWave(sx1268_t *dev) {
     SX1268_SetRxEnPin(dev, false);
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_TX_CW, NULL, 0U);
+    sx1268_err_t err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_TX_CW, NULL, 0U);
+    if(err != SX1268_OK) {
+		return err;
+	}
     dev->op_mode = SX1268_MODE_TX;
+
+    return SX1268_OK;
 }
 
 // Check if frequency is in supported band (410-493MHz)
@@ -379,7 +682,7 @@ bool SX1268_CheckRfFrequency(uint32_t freq_hz) {
 }
 
 // Calibrate receiver image rejection for the target sub-GHz ISM band
-void SX1268_CalibrateImage(sx1268_t *dev, uint32_t freq_hz) {
+sx1268_err_t SX1268_CalibrateImage(sx1268_t *dev, uint32_t freq_hz) {
     uint8_t cal_freq[2];
     if(freq_hz >= 460000000UL) {
         cal_freq[0] = 0x75U; // start 470-510MHz
@@ -389,15 +692,18 @@ void SX1268_CalibrateImage(sx1268_t *dev, uint32_t freq_hz) {
         cal_freq[1] = 0x6FU; // stop
     }
 
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_CALIBRATE_IMAGE, cal_freq, 2U);
+    return SX1268_SpiWriteCmd(dev, SX1268_CMD_CALIBRATE_IMAGE, cal_freq, 2U);
 }
 
-bool SX1268_SetRfFrequency(sx1268_t *dev, uint32_t freq_hz) {
-    if(!SX1268_CheckRfFrequency(freq_hz)) return false;
+sx1268_err_t SX1268_SetRfFrequency(sx1268_t *dev, uint32_t freq_hz) {
+    if(!SX1268_CheckRfFrequency(freq_hz)) return SX1268_ERR_INVALID_PARAM;
 
     // Run image calibration
     if(!dev->image_calibrated) {
-        SX1268_CalibrateImage(dev, freq_hz);
+    	sx1268_err_t err = SX1268_CalibrateImage(dev, freq_hz);
+    	if(err != SX1268_OK) {
+			return err;
+		}
         dev->image_calibrated = true;
     }
 
@@ -410,13 +716,11 @@ bool SX1268_SetRfFrequency(sx1268_t *dev, uint32_t freq_hz) {
         (uint8_t)(rf_freq_reg & 0xFFU)
     };
 
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_RF_FREQUENCY, buf, 4U);
-
-    return true;
+    return SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_RF_FREQUENCY, buf, 4U);
 }
 
 // Configure internal PA and TX output power (-9;+22)dBm + ramp time
-void SX1268_SetTxParams(sx1268_t *dev, int8_t power_dbm, sx1268_ramp_time_t ramp_time) {
+sx1268_err_t SX1268_SetTxParams(sx1268_t *dev, int8_t power_dbm, sx1268_ramp_time_t ramp_time) {
     uint8_t pa_cfg[4] = {
         0x04U,                          // paDutyCycle = 0x04 (never exceed 0x04)
         0x07U,                          // hpMax = 0x07 (max PA size capable of +22 dBm)
@@ -424,7 +728,11 @@ void SX1268_SetTxParams(sx1268_t *dev, int8_t power_dbm, sx1268_ramp_time_t ramp
         SX1268_PA_LUT_CONST             // paLut = 0x01
     };
 
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_PA_CONFIG, pa_cfg, 4U);
+    sx1268_err_t err = SX1268_OK;
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_PA_CONFIG, pa_cfg, 4U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // Clamp power setpoint high-power PA
     if(power_dbm > SX1268_PA_MAX_POWER_DBM) {
@@ -434,26 +742,34 @@ void SX1268_SetTxParams(sx1268_t *dev, int8_t power_dbm, sx1268_ramp_time_t ramp
     }
 
     // Set Over-Current Protection to 140mA
-    SX1268_WriteRegByte(dev, SX1268_REG_OCP, SX1268_OCP_140MA);
+    uint8_t ocp = SX1268_OCP_140MA;
+    err = SX1268_WriteRegVerify(dev, SX1268_REG_OCP, &ocp, 1U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     // Send output power and PA ramp-up time
     uint8_t tx_buf[2] = { 
         (uint8_t)power_dbm, 
         (uint8_t)ramp_time 
     };
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_TX_PARAMS, tx_buf, 2U);
+    return SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_TX_PARAMS, tx_buf, 2U);
 }
 
 // Configure Lora modulation parameters (spreading factor, bandwidth, coding rate, low data rate optimization)
-void SX1268_SetLoraModulationParams(sx1268_t *dev, const sx1268_lora_mod_params_t *params) {
-    dev->lora_mod = *params;
-
+sx1268_err_t SX1268_SetLoraModulationParams(sx1268_t *dev, const sx1268_lora_mod_params_t *params) {
+    sx1268_err_t err = SX1268_OK;
     // Protection Lora mode before setup
     if(dev->packet_type != SX1268_PACKET_TYPE_LORA) {
         dev->packet_type = SX1268_PACKET_TYPE_LORA;
         uint8_t pkt_type = (uint8_t)SX1268_PACKET_TYPE_LORA;
-        SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_PACKET_TYPE, &pkt_type, 1U);
+        err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_PACKET_TYPE, &pkt_type, 1U);
+        if(err != SX1268_OK) {
+			return err;
+		}
     }
+
+    dev->lora_mod = *params;
 
     uint8_t buf[4] = {
         (uint8_t)params->spreading_factor,      // SF5 to SF12
@@ -462,13 +778,16 @@ void SX1268_SetLoraModulationParams(sx1268_t *dev, const sx1268_lora_mod_params_
         params->ldro_enable ? 0x01U : 0x00U     // Low Data Rate Optimization (1 = ON when symbol time >= 16.38ms)
     };
 
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_MODULATION_PARAMS, buf, 4U);
+    err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_MODULATION_PARAMS, buf, 4U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
-    SX1268_ApplyTxModulationWorkaround(dev);
+    return SX1268_ApplyTxModulationWorkaround(dev);
 }
 
 // Configure Lora frame format (preamble length, header mode, payload length, crc, iq polarity)
-void SX1268_SetLoraPacketParams(sx1268_t *dev, const sx1268_lora_pkt_params_t *params) {
+sx1268_err_t SX1268_SetLoraPacketParams(sx1268_t *dev, const sx1268_lora_pkt_params_t *params) {
     dev->lora_pkt = *params;
 
     // SF5 and SF6 require a minimum preamble of 12 symbols for reliable detection
@@ -487,33 +806,36 @@ void SX1268_SetLoraPacketParams(sx1268_t *dev, const sx1268_lora_pkt_params_t *p
         (uint8_t)params->invert_iq
     };
 
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_PACKET_PARAMS, buf, 6U);
+    sx1268_err_t err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_PACKET_PARAMS, buf, 6U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
-    SX1268_ApplyIqPolarityWorkaround(dev, params->invert_iq);
+    return SX1268_ApplyIqPolarityWorkaround(dev, params->invert_iq);
 }
 
-void SX1268_SetStopTimerOnPreamble(sx1268_t *dev, bool enable) {
+sx1268_err_t SX1268_SetStopTimerOnPreamble(sx1268_t *dev, bool enable) {
     uint8_t val = enable ? 0x01U : 0x00U;
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_STOP_TIMER_ON_PREAMBLE, &val, 1U);
+    return SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_STOP_TIMER_ON_PREAMBLE, &val, 1U);
 }
 
 // Configure number of LoRa symbols before RX timeout triggers if no lock occurs
-void SX1268_SetLoraSymbTimeout(sx1268_t *dev, uint8_t symb_num) {
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_LORA_SYMB_TIMEOUT, &symb_num, 1U);
+sx1268_err_t SX1268_SetLoraSymbTimeout(sx1268_t *dev, uint8_t symb_num) {
+    return SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_LORA_SYMB_TIMEOUT, &symb_num, 1U);
 }
 
 // Set Lora syncWord for public or private network
-void SX1268_SetPublicNetwork(sx1268_t *dev, bool is_public) {
+sx1268_err_t SX1268_SetPublicNetwork(sx1268_t *dev, bool is_public) {
     uint16_t syncword = is_public ? SX1268_LORA_SYNCWORD_PUBLIC : SX1268_LORA_SYNCWORD_PRIVATE;
-    uint8_t buf[2] = {
-        (uint8_t)((syncword >> 8U) & 0xFFU),    // SyncWord MSB at 0x0740
-        (uint8_t)(syncword & 0xFFU)             // SyncWord LSB at 0x0741
+    const uint8_t buf[2] = {
+    	(uint8_t)((syncword >> 8U) & 0xFFU),    // SyncWord MSB at 0x0740
+		(uint8_t)(syncword & 0xFFU)             // SyncWord LSB at 0x0741
     };
 
-    SX1268_SpiWriteReg(dev, SX1268_REG_LR_SYNCWORD_MSB, buf, 2U);
+    return SX1268_WriteRegVerify(dev, SX1268_REG_LR_SYNCWORD_MSB, buf, 2U);
 }
 
-void SX1268_SetDio1IrqParams(sx1268_t *dev, uint16_t irq_mask) {
+sx1268_err_t SX1268_SetDio1IrqParams(sx1268_t *dev, uint16_t irq_mask) {
     /*
      * global irqmask : enables the requested interrupt sources
      * DIO1 Mask      : routes all enabled IRQs to the WKUP/EXTI pin
@@ -521,7 +843,7 @@ void SX1268_SetDio1IrqParams(sx1268_t *dev, uint16_t irq_mask) {
      * DIO3 Mask      : forced to 0x0000 because DIO3 outputs 2.2V for the internal TCXO
      */
     uint8_t buf[8] = {
-        (uint8_t)((irq_mask >> 8U) & 0xFFU),    // Global IRQ mask
+    	(uint8_t)((irq_mask >> 8U) & 0xFFU),    // Global IRQ mask
         (uint8_t)(irq_mask & 0xFFU),
         (uint8_t)((irq_mask >> 8U) & 0xFFU),    // DIO1 IRQ mask
         (uint8_t)(irq_mask & 0xFFU),
@@ -531,31 +853,38 @@ void SX1268_SetDio1IrqParams(sx1268_t *dev, uint16_t irq_mask) {
         0x00U
     };
 
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_DIO_IRQ_PARAMS, buf, 8U);
+    return SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_DIO_IRQ_PARAMS, buf, 8U);
 }
 
 // Read active irq flags, clear them in hardware, and update RF switch/operating mode
 uint16_t SX1268_GetIrq(sx1268_t *dev) {
+	sx1268_err_t err = SX1268_OK;
     uint8_t irq_buf[2] = { 0U, 0U };
-    SX1268_SpiReadCmd(dev, SX1268_CMD_GET_IRQ_STATUS, irq_buf, 2U); // Read 16-bit irq status
+    err = SX1268_SpiReadCmd(dev, SX1268_CMD_GET_IRQ_STATUS, irq_buf, 2U); // Read 16-bit irq status
+    if(err != SX1268_OK) {
+		return (uint16_t)(((uint16_t)irq_buf[0] << 8U) | irq_buf[1]);
+	}
 
     uint16_t irq_status = (uint16_t)(((uint16_t)irq_buf[0] << 8U) | irq_buf[1]);
-
     // Clear all triggered irq flags
     if(irq_status != 0U) {
-    	SX1268_SpiWriteCmd(dev, SX1268_CMD_CLR_IRQ_STATUS, irq_buf, 2U);
+    	err = SX1268_SpiWriteCmd(dev, SX1268_CMD_CLR_IRQ_STATUS, irq_buf, 2U);
+    	if(err != SX1268_OK) {
+    		return (uint16_t)(((uint16_t)irq_buf[0] << 8U) | irq_buf[1]);
+		}
     }
-
     if((irq_status & SX1268_IRQ_TX_DONE) != 0U) {
         dev->op_mode = SX1268_MODE_STDBY_RC;
     }
-
     // After single RX finishes or times out, turn off external LNA (RXEN = 0) and apply RTC fix
     if((irq_status & (SX1268_IRQ_RX_DONE | SX1268_IRQ_RX_TX_TIMEOUT | SX1268_IRQ_HEADER_ERROR)) != 0U) {
         if(dev->op_mode == SX1268_MODE_RX && !dev->rx_continuous) {
         	SX1268_SetRxEnPin(dev, false);           // Turn off external LNA to save power in standby
             dev->op_mode = SX1268_MODE_STDBY_RC;
-            SX1268_ApplyRtcTimeoutWorkaround(dev);  // Stop RTC timer
+            err = SX1268_ApplyRtcTimeoutWorkaround(dev);  // Stop RTC timer
+            if(err != SX1268_OK) {
+            	return (uint16_t)(((uint16_t)irq_buf[0] << 8U) | irq_buf[1]);
+			}
         } else if(dev->op_mode == SX1268_MODE_TX) {
             dev->op_mode = SX1268_MODE_STDBY_RC;
         }
@@ -565,51 +894,78 @@ uint16_t SX1268_GetIrq(sx1268_t *dev) {
 }
 
 // Load payload into FIFO at offset 0x00 and start transmission
-void SX1268_SendPayload(sx1268_t *dev, const uint8_t *payload, uint8_t size, uint32_t timeout_rtc_steps) {
+sx1268_err_t SX1268_SendPayload(sx1268_t *dev, const uint8_t *payload, uint8_t size, uint32_t timeout_rtc_steps) {
+	sx1268_err_t err = SX1268_OK;
     dev->lora_pkt.payload_len = size;
-    SX1268_SetLoraPacketParams(dev, &dev->lora_pkt);    // Send updated packet length to radio
+    err = SX1268_SetLoraPacketParams(dev, &dev->lora_pkt); // Send updated packet length to radio
+    if(err != SX1268_OK) {
+		return err;
+	}
 
-    SX1268_SpiWriteBuf(dev, 0x00U, payload, size);       // Write payload bytes into FIFO starting at offset 0x00
+    err = SX1268_SpiWriteBuf(dev, 0x00U, payload, size); // Write payload bytes into FIFO starting at offset 0x00
+    if(err != SX1268_OK) {
+		return err;
+	}
 
-    SX1268_SetTx(dev, timeout_rtc_steps);
+    return SX1268_SetTx(dev, timeout_rtc_steps);
 }
 
 // Read received packet from FIFO buffer
-bool SX1268_GetPayload(sx1268_t *dev, uint8_t *buffer, uint8_t *size, uint8_t max_size) {
+sx1268_err_t SX1268_GetPayload(sx1268_t *dev, uint8_t *buffer, uint8_t *size, uint8_t max_size) {
+	sx1268_err_t err = SX1268_OK;
 	uint8_t status[2] = { 0U, 0U };
-	SX1268_SpiReadCmd(dev, SX1268_CMD_GET_RX_BUFFER_STATUS, status, 2U);
+	err = SX1268_SpiReadCmd(dev, SX1268_CMD_GET_RX_BUFFER_STATUS, status, 2U);
+	if(err != SX1268_OK) {
+		return err;
+	}
 
     uint8_t rx_len = status[0];     // Number of received bytes
     uint8_t rx_offset = status[1];  // FIFO offset where the received packet starts
 
+    // Protection buffer overflow
+	if(rx_len > max_size) return SX1268_ERR_BUFFER_OVERFLOW;
+
     // Lora implicit header mode (bit 7 of 0x0704 == 1), read payload size from register 0x0702
-    if((dev->packet_type == SX1268_PACKET_TYPE_LORA) && ((SX1268_ReadRegByte(dev, SX1268_REG_LR_PACKET_PARAMS) >> 7U) == 1U)) {
-        rx_len = SX1268_ReadRegByte(dev, SX1268_REG_LR_PAYLOAD_LENGTH);
+	uint8_t rx_buf = 0U;
+	err = SX1268_SpiReadReg(dev, SX1268_REG_LR_PACKET_PARAMS, &rx_buf, 1U);
+	if(err != SX1268_OK) {
+		return err;
+	}
+    if((dev->packet_type == SX1268_PACKET_TYPE_LORA) && (rx_buf >> 7U) == 1U) {
+        err = SX1268_SpiReadReg(dev, SX1268_REG_LR_PAYLOAD_LENGTH, &rx_len, 1U);
+        if(err != SX1268_OK) {
+			return err;
+		}
     }
 
     // Protection buffer overflow
-    if(rx_len > max_size) return false;
+	if(rx_len > max_size) return SX1268_ERR_BUFFER_OVERFLOW;
 
     *size = rx_len;
-    SX1268_SpiReadBuf(dev, rx_offset, buffer, rx_len);
-
-    return true;
+    return SX1268_SpiReadBuf(dev, rx_offset, buffer, rx_len);
 }
 
 // Get RSSI and SNR metrics of the last received Lora packet
-void SX1268_GetLoraPacketStatus(sx1268_t *dev, sx1268_lora_pkt_status_t *pkt_status) {
+sx1268_err_t SX1268_GetLoraPacketStatus(sx1268_t *dev, sx1268_lora_pkt_status_t *pkt_status) {
     uint8_t status[3] = { 0U, 0U, 0U };
-    SX1268_SpiReadCmd(dev, SX1268_CMD_GET_PACKET_STATUS, status, 3U);
+    sx1268_err_t err = SX1268_SpiReadCmd(dev, SX1268_CMD_GET_PACKET_STATUS, status, 3U);
+    if(err != SX1268_OK) {
+		return err;
+	}
 
     pkt_status->rssi_pkt_dbm        = (int8_t)(-(int16_t)status[0] >> 1);   // Average packet RSSI = -RssiPkt / 2 (dBm)
     pkt_status->snr_pkt_db          = (int8_t)(((int8_t)status[1]) >> 2);   // Packet SNR = SnrPkt / 4 (dB, 2's complement)
     pkt_status->signal_rssi_pkt_dbm = (int8_t)(-(int16_t)status[2] >> 1);   // Despread Lora signal RSSI = -SignalRssiPkt / 2 (dBm)
+
+    return SX1268_OK;
 }
 
 // Get instantaneous RSSI
 int8_t SX1268_GetRssiInstant(sx1268_t *dev) {
     uint8_t raw_rssi = 0U;
-    SX1268_SpiReadCmd(dev, SX1268_CMD_GET_RSSI_INST, &raw_rssi, 1U);
+    if(SX1268_SpiReadCmd(dev, SX1268_CMD_GET_RSSI_INST, &raw_rssi, 1U) != SX1268_OK) {
+    	return INT8_MIN;
+    }
 
     return (int8_t)(-(int16_t)raw_rssi >> 1);
 }
@@ -617,7 +973,10 @@ int8_t SX1268_GetRssiInstant(sx1268_t *dev) {
 // Read 32-bit random number from hardware RNG registers
 uint32_t SX1268_GetRandomHardware(sx1268_t *dev) {
     uint8_t buf[4] = { 0U, 0U, 0U, 0U };
-    SX1268_SpiReadReg(dev, SX1268_REG_RNG_BASE, buf, 4U);
+    if(SX1268_SpiReadReg(dev, SX1268_REG_RNG_BASE, buf, 4U) != SX1268_OK) {
+    	return UINT32_MAX;
+    }
+
     return ((uint32_t)buf[0] << 24U) |
            ((uint32_t)buf[1] << 16U) |
            ((uint32_t)buf[2] << 8U)  |
@@ -625,7 +984,7 @@ uint32_t SX1268_GetRandomHardware(sx1268_t *dev) {
 }
 
 // Configure optimal Channel Activity Detection thresholds from Semtech AN1200.48
-void SX1268_ConfigureOptimalCad(sx1268_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t cad_timeout) {
+sx1268_err_t SX1268_ConfigureOptimalCad(sx1268_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t cad_timeout) {
     sx1268_cad_symbols_t cad_symbols = SX1268_CAD_04_SYMBOL;
     uint8_t det_peak = 24U;
     const uint8_t det_min = 10U; // Recommended by Semtech AN1200.48 (cadDetMin)
@@ -701,14 +1060,20 @@ void SX1268_ConfigureOptimalCad(sx1268_t *dev, sx1268_cad_exit_mode_t exit_mode,
         (uint8_t)(cad_timeout & 0xFFU)
     };
 
-    SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_CAD_PARAMS, buf, 7U);
+    return SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_CAD_PARAMS, buf, 7U);
 }
 
 // Start a Lora channel activity detection scan
-void SX1268_StartCad(sx1268_t *dev) {
+sx1268_err_t SX1268_StartCad(sx1268_t *dev) {
 	SX1268_SetRxEnPin(dev, true);
-	SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_CAD, NULL, 0U);
+	sx1268_err_t err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_CAD, NULL, 0U);
+	if(err != SX1268_OK) {
+		SX1268_SetRxEnPin(dev, false);
+		return err;
+	}
 	dev->op_mode = SX1268_MODE_CAD;
+
+	return SX1268_OK;
 }
 
 // Compute LoRa packet Time-on-Air in milliseconds
