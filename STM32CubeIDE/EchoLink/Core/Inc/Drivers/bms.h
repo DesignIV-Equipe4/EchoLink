@@ -23,8 +23,29 @@
 #define BMS_FRAME_SIZE        	13U
 #define BMS_UART_TIMEOUT_MS    	150U
 
-#define BMS_MAX_CELLS          	48U
-#define BMS_MAX_TEMP          	16U
+#define BMS_MAX_CELLS_COUNT   	48U
+#define BMS_MAX_TEMP_COUNT     	16U
+
+#define BMS_MIN_TEMP_SENSOR_C	(-40)
+#define BMS_MAX_TEMP_SENSOR_C	(85)
+
+
+typedef enum {
+    BMS_OK = 0,
+	BMS_ERR_NULL_PTR,
+    BMS_ERR_INVALID_PARAM,
+    BMS_ERR_UART_TX,
+    BMS_ERR_UART_RX,
+    BMS_ERR_UART_TIMEOUT,
+    BMS_ERR_UART_BUSY,
+    BMS_ERR_INVALID_START,
+    BMS_ERR_INVALID_ADDR,
+    BMS_ERR_INVALID_CMD,
+    BMS_ERR_INVALID_LEN,
+    BMS_ERR_CHECKSUM,
+    BMS_ERR_INVALID_FRAME_IDX,
+    BMS_ERR_NO_CONFIG
+} bms_status_t;
 
 typedef enum {
     BMS_CMD_SOC_VOLT_CURR  	= 0x90U,	// SOC, voltage and current
@@ -35,7 +56,8 @@ typedef enum {
     BMS_CMD_CELL_VOLTAGES  	= 0x95U,    // Individual cell voltages (1-48)
     BMS_CMD_CELL_TEMPS     	= 0x96U,    // Individual cell temperatures (1-16)
     BMS_CMD_CELL_BALANCE   	= 0x97U,    // Individual cell balancing (1-48)
-    BMS_CMD_FALURE_STATUS 	= 0x98U   	// Fault flags
+    BMS_CMD_FALURE_STATUS 	= 0x98U,   	// Fault flags
+	BMS_CMD_MAX
 } bms_cmd_t;
 
 typedef enum {
@@ -68,9 +90,9 @@ typedef struct {
     uint16_t 			min_cell_mv;
     uint8_t  			min_cell_no;
     // 0x92
-    int8_t   			max_temp_c;            		// offset 40deg
+    int16_t   			max_temp_c;            		// offset 40deg
     uint8_t  			max_temp_no;
-    int8_t   			min_temp_c;            		// offset 40deg
+    int16_t   			min_temp_c;            		// offset 40deg
     uint8_t  			min_temp_no;
     // 0x93
     bms_charge_states_t charge_state;
@@ -86,9 +108,9 @@ typedef struct {
     uint8_t  			io_state;              		// Bits 0..3: DI1..4, Bits 4..7: DO1..4
     uint16_t 			charge_discharge_cycles;	// Check if not reserved
     // 0x95
-    uint16_t 			cell_voltages_mv[BMS_MAX_CELLS];
+    uint16_t 			cell_voltages_mv[BMS_MAX_CELLS_COUNT];
     // 0x96
-    int8_t   			cell_temps_c[BMS_MAX_TEMP];
+    int16_t   			cell_temps_c[BMS_MAX_TEMP_COUNT];
     // 0x97
     uint64_t 			cell_balance_mask;
     // 0x98
@@ -96,26 +118,26 @@ typedef struct {
 } bms_data_t;
 
 typedef struct {
-    UART_HandleTypeDef *huart;
-    uint8_t host_addr;
-    uint32_t timeout_ms;
-    bms_data_t data;
+    UART_HandleTypeDef 	*huart;
+    uint8_t 			host_addr;
+    uint32_t 			timeout_ms;
+    bms_data_t 			data;
 } bms_t;
 
 
-void BMS_Init(bms_t *bms);
+bms_status_t BMS_Init(bms_t *bms);
 
-HAL_StatusTypeDef BMS_GetSocVoltageCurrent(bms_t *bms);
-HAL_StatusTypeDef BMS_GetMinMaxVoltage(bms_t *bms);
-HAL_StatusTypeDef BMS_GetMinMaxTemp(bms_t *bms);
-HAL_StatusTypeDef BMS_GetMosStatus(bms_t *bms);
-HAL_StatusTypeDef BMS_GetGenericStatus(bms_t *bms);
-HAL_StatusTypeDef BMS_GetCellVoltages(bms_t *bms);
-HAL_StatusTypeDef BMS_GetCellTemps(bms_t *bms);
-HAL_StatusTypeDef BMS_GetCellBalance(bms_t *bms);
-HAL_StatusTypeDef BMS_GetFailureStatus(bms_t *bms);
+bms_status_t BMS_GetSocVoltageCurrent(bms_t *bms);
+bms_status_t BMS_GetMinMaxVoltage(bms_t *bms);
+bms_status_t BMS_GetMinMaxTemp(bms_t *bms);
+bms_status_t BMS_GetMosStatus(bms_t *bms);
+bms_status_t BMS_GetGenericStatus(bms_t *bms);
+bms_status_t BMS_GetCellVoltages(bms_t *bms);
+bms_status_t BMS_GetCellTemps(bms_t *bms);
+bms_status_t BMS_GetCellBalance(bms_t *bms);
+bms_status_t BMS_GetFailureStatus(bms_t *bms);
 
-HAL_StatusTypeDef BMS_UpdateAll(bms_t *bms);
+bms_status_t BMS_UpdateAll(bms_t *bms);
 bool BMS_IsCellBalancing(const bms_t *bms, uint8_t cell_index_1_to_48);
 
 
