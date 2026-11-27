@@ -1,4 +1,4 @@
-#include "Drivers/radio.h"
+#include <Drivers/radio.h>
 #include <string.h>
 
 
@@ -209,13 +209,16 @@ radio_err_t Radio_Init(radio_t *dev, const radio_events_t *events) {
 	}
 
     // Set private LoraWan and set default to 33 dBm SMA output setpoint (+14 dBm internal PA) and mask all IRQs
-	if((sx_err = SX1268_SetPublicNetwork(&dev->sx1268, false)) != SX1268_OK) {
+	sx_err = SX1268_SetPublicNetwork(&dev->sx1268, false);
+	if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
 	}
-	if((sx_err = SX1268_SetTxParams(&dev->sx1268, dev->tx_power_dbm, SX1268_RAMP_200_US)) != SX1268_OK) {
+	sx_err = SX1268_SetTxParams(&dev->sx1268, dev->tx_power_dbm, SX1268_RAMP_200_US);
+	if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
 	}
-	if((sx_err = SX1268_SetDio1IrqParams(&dev->sx1268, SX1268_IRQ_NONE)) != SX1268_OK) {
+	sx_err = SX1268_SetDio1IrqParams(&dev->sx1268, SX1268_IRQ_NONE);
+	if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
 	}
 

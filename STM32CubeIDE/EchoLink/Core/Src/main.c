@@ -22,8 +22,10 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Drivers/radio.h"
+#include "Systems/power_management.h"
 #include "Drivers/isow1044.h"
+#include "Drivers/radio.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,7 +103,7 @@ isow1044_t isow1044_dev = {
 		.stb_pin = ISO_STB_Pin,
 		.en_fnc_port = ISO_FNC_GPIO_Port,
 		.en_fnc_pin = ISO_FNC_Pin,
-		.dcdc_on = false,
+		.dcdc_on = true,
 		.mode = ISOW1044_MODE_NORMAL,
 		.local_node_id = 1U
 };
@@ -151,7 +153,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  PowerMgt_Init();
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */

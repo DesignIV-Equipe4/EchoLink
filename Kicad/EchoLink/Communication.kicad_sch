@@ -4155,6 +4155,19 @@
 		)
 		(uuid "3290e992-c3ef-4415-a5e8-9556d59afa5d")
 	)
+	(text "Retirer 22ohm"
+		(exclude_from_sim no)
+		(at 52.07 117.348 0)
+		(effects
+			(font
+				(size 2.54 2.54)
+				(thickness 0.254)
+				(bold yes)
+			)
+			(justify left bottom)
+		)
+		(uuid "7531f29f-998b-4961-aa08-52a5dff1b7b3")
+	)
 	(text "Consumption [1200, 14, 0.002] mA\nTemperature [-40, 85] C"
 		(exclude_from_sim no)
 		(at 241.808 32.004 0)
