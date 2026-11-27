@@ -177,10 +177,63 @@ static radio_err_t Radio_StartRxInternal(radio_t *dev, uint32_t timeout_ms, bool
 		}
 	}
 
-	dev->rx_boosted = boosted;
-	dev->state      = RADIO_STATE_RX_RUNNING;
+    sx_err = SX1268_SetRx(&dev->sx1268, rtc_steps, boosted);
+	if(sx_err != SX1268_OK) {
+		return Radio_MapError(sx_err);
+	}
+	dev->state = RADIO_STATE_RX_RUNNING;
 
-	return Radio_MapError(SX1268_SetRx(&dev->sx1268, rtc_steps, boosted));
+	return RADIO_OK;
+}
+
+// Internal helper to compute adaptation step of tx power needed
+int8_t Radio_ComputeAdaptiveTxPower(radio_t *dev, int8_t current_setpoint_dbm, int8_t rssi_dbm, int8_t snr_db) {
+    int8_t idx 			= Radio_FindPowerIndex(current_setpoint_dbm);
+    int8_t snr_floor 	= Radio_GetLoraSnrFloor(dev->sx1268.lora_mod.spreading_factor);
+    int8_t snr_margin 	= (int8_t)(snr_db - snr_floor);
+    int8_t step 		= 0;
+
+    // Protection against saturation at very short range
+    if(rssi_dbm > RADIO_TPC_RSSI_SATURATION_DBM) {
+		step = -2;
+	}
+    // Priority given to link reliability
+    else if((snr_margin < RADIO_TPC_SNR_MARGIN_CRIT_DB) || (rssi_dbm < RADIO_TPC_RSSI_CRITICAL_DBM)) {
+        step = 2;
+    } else if((snr_margin < RADIO_TPC_SNR_MARGIN_LOW_DB) || (rssi_dbm < RADIO_TPC_RSSI_LOW_DBM)) {
+        step = 1;
+    }
+    // Power-saving only if RSSI and SNR margin are in hysteresis
+    else if((snr_margin > RADIO_TPC_SNR_MARGIN_HIGH_DB) && (rssi_dbm > RADIO_TPC_RSSI_HIGH_DBM)) {
+        step = -1;
+    }
+
+    idx = (int8_t)(idx + step);
+    if(idx < 0) {
+        idx = 0;
+    } else if(idx >= (int8_t)RADIO_E22_PWR_LEVEL_COUNT) {
+        idx = (int8_t)(RADIO_E22_PWR_LEVEL_COUNT - 1U);
+    }
+
+    return radio_pwr_lut[idx];
+}
+
+// Internal helper to compute adaptation step of rx boost needed
+bool Radio_ComputeAdaptiveRxBoost(radio_t *dev, bool current_boosted, int8_t rssi_dbm, int8_t snr_db) {
+    int8_t snr_floor  = Radio_GetLoraSnrFloor(dev->sx1268.lora_mod.spreading_factor);
+    int8_t snr_margin = (int8_t)(snr_db - snr_floor);
+
+    // Boosted gain if weak signal
+    if((rssi_dbm < RADIO_RX_BOOST_ON_RSSI_DBM) || (snr_margin < RADIO_RX_BOOST_ON_SNR_MARGIN_DB)) {
+        return true;
+    }
+
+    // Power-saving only if RSSI and SNR margin are in hysteresis
+    if((rssi_dbm > RADIO_RX_BOOST_OFF_RSSI_DBM) && (snr_margin > RADIO_RX_BOOST_OFF_SNR_MARGIN_DB)) {
+        return false;
+    }
+
+    return current_boosted;
 }
 
 
@@ -231,7 +284,7 @@ radio_state_t Radio_GetStatus(radio_t *dev) {
 
 // Hot-start initialization and restores STM32 context on sys_wkup pin
 radio_err_t Radio_WakeupInit(radio_t *dev, const radio_events_t *events, const radio_lora_config_t *cfg) {
-    if(cfg == NULL) {
+    if((dev == NULL) && (cfg == NULL)) {
         return RADIO_ERR_NULL_PTR;
     }
 
@@ -285,6 +338,9 @@ radio_err_t Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg) {
     }
 
     // Set RF carrier frequency and run image calibration
+    if(!SX1268_CheckRfFrequency(cfg->freq_hz)) {
+    	return RADIO_ERR_INVALID_FREQ;
+    }
     sx_err = SX1268_SetRfFrequency(&dev->sx1268, cfg->freq_hz);
     if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
@@ -348,20 +404,27 @@ radio_err_t Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg) {
 
 // Change RF carrier frequency
 radio_err_t Radio_SetChannel(radio_t *dev, uint32_t freq_hz) {
+	if(!SX1268_CheckRfFrequency(freq_hz)) {
+		return RADIO_ERR_INVALID_FREQ;
+	}
+
     return Radio_MapError(SX1268_SetRfFrequency(&dev->sx1268, freq_hz));
 }
 
-// Change TX output power setpoint
+// Change TX output power setpoint (manually)
 radio_err_t Radio_SetTxPower(radio_t *dev, int8_t power_dbm) {
+    if(dev == NULL) {
+        return RADIO_ERR_NULL_PTR;
+    }
+
     int8_t safe_pwr = Radio_ClampPower(power_dbm);
+    sx1268_err_t sx_err = SX1268_SetTxParams(&dev->sx1268, safe_pwr, SX1268_RAMP_200_US);
+    if(sx_err != SX1268_OK) {
+        return Radio_MapError(sx_err);
+    }
     dev->tx_power_dbm = safe_pwr;
 
-    return Radio_MapError(SX1268_SetTxParams(&dev->sx1268, safe_pwr, SX1268_RAMP_200_US));
-}
-
-// Change RX input power to boosted mode
-void Radio_SetRxBoosted(radio_t *dev, bool boosted) {
-    dev->rx_boosted = boosted;
+    return RADIO_OK;
 }
 
 // Switch between Public and Private LoRa SyncWord
@@ -371,83 +434,29 @@ radio_err_t Radio_SetPublicNetwork(radio_t *dev, bool is_public) {
 
 // Update maximum payload length in LoRa packet
 radio_err_t Radio_SetMaxPayloadLength(radio_t *dev, uint8_t max_len) {
-    dev->sx1268.lora_pkt.payload_len = max_len;
-    return Radio_MapError(SX1268_SetLoraPacketParams(&dev->sx1268, &dev->sx1268.lora_pkt));
-}
-
-// Compute adaptation step of tx power needed
-int8_t Radio_ComputeAdaptiveTxPower(radio_t *dev, int8_t current_setpoint_dbm, int8_t rssi_dbm, int8_t snr_db) {
-    int8_t idx = Radio_FindPowerIndex(current_setpoint_dbm);
-    int8_t snr_floor = Radio_GetLoraSnrFloor(dev->sx1268.lora_mod.spreading_factor);
-    int8_t snr_margin = (int8_t)(snr_db - snr_floor);
-    int8_t step = 0;
-
-    // Priority given to link reliability
-    if((snr_margin < RADIO_TPC_SNR_MARGIN_CRIT_DB) || (rssi_dbm < RADIO_TPC_RSSI_CRITICAL_DBM)) {
-        step = 2;
-    } else if((snr_margin < RADIO_TPC_SNR_MARGIN_LOW_DB) || (rssi_dbm < RADIO_TPC_RSSI_LOW_DBM)) {
-        step = 1;
-    }
-    // Protection against saturation at very short range
-    else if(rssi_dbm > RADIO_TPC_RSSI_SATURATION_DBM) {
-        step = -2;
-    }
-    // Power-saving only if RSSI and SNR margin are in hysteresis
-    else if((snr_margin > RADIO_TPC_SNR_MARGIN_HIGH_DB) && (rssi_dbm > RADIO_TPC_RSSI_HIGH_DBM)) {
-        step = -1;
+    if(dev == NULL) {
+        return RADIO_ERR_NULL_PTR;
     }
 
-    idx = (int8_t)(idx + step);
-    if(idx < 0) {
-        idx = 0;
-    } else if(idx >= (int8_t)RADIO_E22_PWR_LEVEL_COUNT) {
-        idx = (int8_t)(RADIO_E22_PWR_LEVEL_COUNT - 1U);
+    sx1268_lora_pkt_params_t next_pkt = dev->sx1268.lora_pkt;
+    next_pkt.payload_len = max_len;
+
+    sx1268_err_t sx_err = SX1268_SetLoraPacketParams(&dev->sx1268, &next_pkt);
+    if(sx_err != SX1268_OK) {
+        return Radio_MapError(sx_err);
     }
 
-    return radio_pwr_lut[idx];
-}
-
-// Compute adaptation step of rx boost needed
-bool Radio_ComputeAdaptiveRxBoost(radio_t *dev, bool current_boosted, int8_t rssi_dbm, int8_t snr_db) {
-    int8_t snr_floor  = Radio_GetLoraSnrFloor(dev->sx1268.lora_mod.spreading_factor);
-    int8_t snr_margin = (int8_t)(snr_db - snr_floor);
-
-    // Boosted gain if weak signal
-    if((rssi_dbm < RADIO_RX_BOOST_ON_RSSI_DBM) || (snr_margin < RADIO_RX_BOOST_ON_SNR_MARGIN_DB)) {
-        return true;
-    }
-
-    // Power-saving only if RSSI and SNR margin are in hysteresis
-    if((rssi_dbm > RADIO_RX_BOOST_OFF_RSSI_DBM) && (snr_margin > RADIO_RX_BOOST_OFF_SNR_MARGIN_DB)) {
-        return false;
-    }
-
-    return current_boosted;
-}
-
-// Compute and apply new tx power
-int8_t Radio_AdjustTxPower(radio_t *dev, int8_t rssi_dbm, int8_t snr_db) {
-    int8_t target_pwr = Radio_ComputeAdaptiveTxPower(dev, dev->tx_power_dbm, rssi_dbm, snr_db);
-    if(target_pwr != dev->tx_power_dbm) {
-        Radio_SetTxPower(dev, target_pwr);
-    }
-    return dev->tx_power_dbm;
-}
-
-// Compute and apply new rx power
-bool Radio_AdjustRxBoost(radio_t *dev, int8_t rssi_dbm, int8_t snr_db) {
-    dev->rx_boosted = Radio_ComputeAdaptiveRxBoost(dev, dev->rx_boosted, rssi_dbm, snr_db);
-    return dev->rx_boosted;
+    return RADIO_OK;
 }
 
 // Verify if target frequency is within hardware limits
 bool Radio_CheckRfFrequency(uint32_t freq_hz) {
-    return Radio_MapError(SX1268_CheckRfFrequency(freq_hz));
+    return SX1268_CheckRfFrequency(freq_hz);
 }
 
 // Calculate packet Time-on-Air
 uint32_t Radio_GetTimeOnAir(radio_t *dev, uint8_t pkt_len) {
-    return Radio_MapError(SX1268_GetLoraTimeOnAir(&dev->sx1268, pkt_len));
+    return SX1268_GetLoraTimeOnAir(&dev->sx1268, pkt_len);
 }
 
 // Return total wake-up time from Sleep mode
@@ -508,10 +517,9 @@ bool Radio_IsDio1High(radio_t *dev) {
     return (HAL_GPIO_ReadPin(dev->sx1268.dio1_port, dev->sx1268.dio1_pin) == GPIO_PIN_SET);
 }
 
-// Load payload into FIFO and start non-blocking packet transmission
-//TODO: add errors
+// Load payload into FIFO and start non-blocking packet transmission (manually)
 radio_err_t Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size) {
-    if(buffer == NULL) {
+    if((dev == NULL) || buffer == NULL) {
         return RADIO_ERR_NULL_PTR;
     }
     if(size == 0U) {
@@ -537,18 +545,50 @@ radio_err_t Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size) {
     return RADIO_OK;
 }
 
-// Start packet reception with standard power-saving LNA gain
-radio_err_t Radio_Receive(radio_t *dev, uint32_t timeout_ms) {
-    return Radio_StartRxInternal(dev, timeout_ms, false);
+// Start packet reception with standard power-saving LNA gain (manually)
+radio_err_t Radio_Receive(radio_t *dev, uint32_t timeout_ms, bool boosted) {
+    if(dev == NULL) {
+        return RADIO_ERR_NULL_PTR;
+    }
+
+    return Radio_StartRxInternal(dev, timeout_ms, boosted);
 }
 
-// Start packet reception with maximum Boosted LNA sensitivity
-radio_err_t Radio_ReceiveBoosted(radio_t *dev, uint32_t timeout_ms) {
-    return Radio_StartRxInternal(dev, timeout_ms, true);
+/* Start packet reception with standard power-saving LNA gain (adaptive).
+ * Use after a valid rx_done with rssi_dbm/snr_db from 1 Radio_Send call
+ */
+radio_err_t Radio_SendAdaptive(radio_t *dev, const uint8_t *buffer, uint8_t size, int8_t link_rssi_dbm, int8_t link_snr_db) {
+    if((dev == NULL) || (buffer == NULL)) {
+        return RADIO_ERR_NULL_PTR;
+    }
+
+    int8_t target_pwr = Radio_ComputeAdaptiveTxPower(dev, dev->tx_power_dbm, link_rssi_dbm, link_snr_db);
+    if(target_pwr != dev->tx_power_dbm) {
+        radio_err_t err = Radio_SetTxPower(dev, target_pwr);
+        if(err != RADIO_OK) {
+            return err;
+        }
+    }
+
+    return Radio_Send(dev, buffer, size);
 }
 
-radio_err_t Radio_ReceiveAdaptive(radio_t *dev, uint32_t timeout_ms) {
-    return Radio_StartRxInternal(dev, timeout_ms, dev->rx_boosted);
+/* Load payload into FIFO and start non-blocking packet transmission (adaptive)
+ * Use after a valid rx_done with rssi_dbm/snr_db from 1 Radio_Receive call
+ */
+radio_err_t Radio_ReceiveAdaptive(radio_t *dev, uint32_t timeout_ms, int8_t last_rssi_dbm, int8_t last_snr_db) {
+    if(dev == NULL) {
+        return RADIO_ERR_NULL_PTR;
+    }
+
+    bool target_boost = Radio_ComputeAdaptiveRxBoost(dev, dev->rx_boosted, last_rssi_dbm, last_snr_db);
+    radio_err_t err = Radio_StartRxInternal(dev, timeout_ms, target_boost);
+    if(err != RADIO_OK) {
+        return err;
+    }
+    dev->rx_boosted = target_boost;
+
+    return RADIO_OK;
 }
 
 // Start a LoRa Channel Activity Detection scan
@@ -569,10 +609,14 @@ radio_err_t Radio_StartCad(radio_t *dev, sx1268_cad_exit_mode_t exit_mode, uint3
 	}
 
     // Track if CAD automatically transitions to RX upon activity detection
-    dev->cad_pending_after_rx = (exit_mode == SX1268_CAD_EXIT_RX);
-    dev->state = RADIO_STATE_CAD;
+    sx_err = SX1268_StartCad(&dev->sx1268);
+	if(sx_err != SX1268_OK) {
+		return Radio_MapError(sx_err);
+	}
+	dev->cad_pending_after_rx = (exit_mode == SX1268_CAD_EXIT_RX);
+	dev->state = RADIO_STATE_CAD;
 
-    return Radio_MapError(SX1268_StartCad(&dev->sx1268));
+	return RADIO_OK;
 }
 
 // Start autonomous hardware RX / Sleep duty-cycled reception (sniff mode)
@@ -580,32 +624,39 @@ radio_err_t Radio_SetRxDutyCycle(radio_t *dev, uint32_t rx_time_ms, uint32_t sle
     const uint16_t rx_irq_mask = (uint16_t)(SX1268_IRQ_RX_DONE | SX1268_IRQ_CRC_ERROR | SX1268_IRQ_HEADER_ERROR | SX1268_IRQ_RX_TX_TIMEOUT);
     sx1268_err_t sx_err = SX1268_SetDio1IrqParams(&dev->sx1268, rx_irq_mask);
     if(sx_err != SX1268_OK) {
-    	return sx_err;
+    	return Radio_MapError(sx_err);
     }
 
     uint32_t rx_steps    = RADIO_MS_TO_RTC_STEPS(rx_time_ms);
     uint32_t sleep_steps = RADIO_MS_TO_RTC_STEPS(sleep_time_ms);
 
-    dev->state = RADIO_STATE_RX_RUNNING;
-    dev->sx1268.rx_continuous = false;
+    sx_err = SX1268_SetRxDutyCycle(&dev->sx1268, rx_steps, sleep_steps);
+	if(sx_err != SX1268_OK) {
+		return Radio_MapError(sx_err);
+	}
+	dev->sx1268.rx_continuous = false;
+	dev->state = RADIO_STATE_RX_RUNNING;
 
-    return Radio_MapError(SX1268_SetRxDutyCycle(&dev->sx1268, rx_steps, sleep_steps));
+	return RADIO_OK;
 }
 
 // Transmit an unmodulated continuous wave carrier (RF bench testing)
 radio_err_t Radio_SetTxContinuousWave(radio_t *dev, uint32_t freq_hz, int8_t power_dbm) {
+	if(!SX1268_CheckRfFrequency(freq_hz)) {
+		return RADIO_ERR_INVALID_FREQ;
+	}
 	sx1268_err_t sx_err = SX1268_SetRfFrequency(&dev->sx1268, freq_hz);
     if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
 	}
 
-    radio_err_t err = Radio_SetTxPower(dev, power_dbm);
-    if(err != RADIO_OK) {
-    	return err;
-    }
-    dev->state = RADIO_STATE_TX_RUNNING;
+    sx_err = SX1268_SetTxContinuousWave(&dev->sx1268);
+	if(sx_err != SX1268_OK) {
+		return Radio_MapError(sx_err);
+	}
+	dev->state = RADIO_STATE_TX_RUNNING;
 
-    return Radio_MapError(SX1268_SetTxContinuousWave(&dev->sx1268));
+	return RADIO_OK;
 }
 
 // Put radio into low-power Sleep mode with configuration retention (warm start)
@@ -640,17 +691,21 @@ void Radio_OnDio1Irq(radio_t *dev) {
     dev->irq_fired = true;
 }
 
-void Radio_IrqProcess(radio_t *dev) {
+radio_err_t Radio_IrqProcess(radio_t *dev) {
 	if((!dev->irq_fired) && (!Radio_IsDio1High(dev))) {
-		return; // No available interrupt
+		return RADIO_OK; // No available interrupt
 	}
 
     dev->irq_fired = false;
 
     // Fetch and clear hardware IRQ status
-    uint16_t irq_regs = SX1268_GetIrq(&dev->sx1268);
+    uint16_t irq_regs = SX1268_IRQ_NONE;
+    sx1268_err_t sx_err = SX1268_GetIrq(&dev->sx1268);
+    if(sx_err != SX1268_OK) {
+		return Radio_MapError(sx_err);
+	}
 	if(irq_regs == SX1268_IRQ_NONE) {
-		return;
+		return RADIO_OK;
 	}
 
     // Handle TX Done
@@ -664,16 +719,13 @@ void Radio_IrqProcess(radio_t *dev) {
     // Handle CAD Done
 	if((irq_regs & SX1268_IRQ_CAD_DONE) != 0U) {
 		bool detected = ((irq_regs & SX1268_IRQ_CAD_ACTIVITY_DETECTED) != 0U);
-
-		if(detected && dev->cad_pending_after_rx) {
-			dev->sx1268.op_mode = SX1268_MODE_RX;
-			dev->state          = RADIO_STATE_RX_RUNNING;
-		} else {
-			SX1268_SetRxEnPin(dev->sx1268, false);
-			dev->sx1268.op_mode = SX1268_MODE_STDBY_RC;
-			dev->state          = RADIO_STATE_IDLE;
+		sx1268_cad_exit_mode_t exit_mode = dev->cad_pending_after_rx ? SX1268_CAD_EXIT_RX : SX1268_CAD_EXIT_STDBY;
+		sx_err = SX1268_FinishCad(&dev->sx1268, detected, exit_mode);
+		if(sx_err != SX1268_OK) {
+			return Radio_MapError(sx_err);
 		}
 
+		dev->state = (detected && dev->cad_pending_after_rx) ? RADIO_STATE_RX_RUNNING : RADIO_STATE_IDLE;
 		if(dev->events.cad_done != NULL) {
 			dev->events.cad_done(detected);
 		}
@@ -696,16 +748,18 @@ void Radio_IrqProcess(radio_t *dev) {
 			dev->state = RADIO_STATE_IDLE;
 		}
 
-		if(SX1268_GetPayload(&dev->sx1268, dev->rx_buffer, &size, RADIO_MAX_PAYLOAD_LENGTH) == SX1268_OK) {
-			if(SX1268_GetLoraPacketStatus(&dev->sx1268, &pkt_status) != SX1268_OK) {
-				return;
-			}
+		sx_err = SX1268_GetPayload(&dev->sx1268, dev->rx_buffer, &size, RADIO_MAX_PAYLOAD_LENGTH);
+		if(sx_err != SX1268_OK) {
+			return Radio_MapError(sx_err);
+		}
 
-			if(dev->events.rx_done != NULL) {
-				dev->events.rx_done(dev->rx_buffer, size, pkt_status.rssi_pkt_dbm, pkt_status.snr_pkt_db);
-			}
-		} else {
-			return;
+		sx_err = SX1268_GetLoraPacketStatus(&dev->sx1268, &pkt_status);
+		if(sx_err != SX1268_OK) {
+			return Radio_MapError(sx_err);
+		}
+
+		if(dev->events.rx_done != NULL) {
+			dev->events.rx_done(dev->rx_buffer, size, pkt_status.rssi_pkt_dbm, pkt_status.snr_pkt_db);
 		}
 	}
 
@@ -721,11 +775,13 @@ void Radio_IrqProcess(radio_t *dev) {
 		} else if(prev_state == RADIO_STATE_RX_RUNNING) {
 			if(dev->cad_pending_after_rx) {
 				dev->cad_pending_after_rx = false;
-				if(SX1268_SetSleep(&dev->sx1268, true) != SX1268_OK) {
-					return;
+				sx_err = SX1268_SetSleep(&dev->sx1268, true);
+				if(sx_err != SX1268_OK) {
+					return Radio_MapError(sx_err);
 				}
-				if(SX1268_SetStandby(&dev->sx1268, SX1268_STDBY_RC) != SX1268_OK) {
-					return;
+				sx_err = SX1268_SetStandby(&dev->sx1268, SX1268_STDBY_RC);
+				if(sx_err != SX1268_OK) {
+					return Radio_MapError(sx_err);
 				}
 			}
 
@@ -734,4 +790,6 @@ void Radio_IrqProcess(radio_t *dev) {
 			}
 		}
 	}
+
+	return RADIO_OK;
 }

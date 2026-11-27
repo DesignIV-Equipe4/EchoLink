@@ -444,9 +444,19 @@ sx1268_err_t SX1268_Init(sx1268_t *dev) {
 		return err;
 	}
 
+    err = SX1268_ClearDeviceErrors(dev);
+	if(err != SX1268_OK) {
+		return err;
+	}
+
     uint8_t calib_all = 0x7FU;                                      		// Bitmask 0x7F: calibrate RC64k, RC13M, PLL, ADC, and Image
     err = SX1268_SpiWriteCmd(dev, SX1268_CMD_CALIBRATE, &calib_all, 1U); 	// Start full calibration
     if(err != SX1268_OK) {
+		return err;
+	}
+
+    err = SX1268_GetDeviceErrors(dev);
+	if(err != SX1268_OK) {
 		return err;
 	}
 
@@ -475,12 +485,13 @@ sx1268_err_t SX1268_Init(sx1268_t *dev) {
 	}
 
     // Set Lora packet type
-    dev->packet_type = SX1268_PACKET_TYPE_LORA;
     uint8_t pkt_type = (uint8_t)SX1268_PACKET_TYPE_LORA;
     err = SX1268_SpiWriteCmd(dev, SX1268_CMD_SET_PACKET_TYPE, &pkt_type, 1U);
     if(err != SX1268_OK) {
 		return err;
 	}
+
+    dev->packet_type = SX1268_PACKET_TYPE_LORA;
 
     return SX1268_OK;
 }
@@ -528,6 +539,16 @@ sx1268_err_t SX1268_GetDeviceErrors(sx1268_t *dev) {
 
     uint16_t op_error = (uint16_t)(((uint16_t)buf[0] << 8U) | buf[1]);
     return SX1268_DecodeOpErrors(op_error);
+}
+
+sx1268_err_t SX1268_ClearDeviceErrors(sx1268_t *dev) {
+    if(dev == NULL) {
+        return SX1268_ERR_NULL_PTR;
+    }
+
+    uint8_t dummy[2] = { 0x00U, 0x00U };
+
+    return SX1268_SpiWriteCmd(dev, SX1268_CMD_CLR_DEVICE_ERRORS, dummy, 2U);
 }
 
 sx1268_err_t SX1268_IsCommunicatingMcu(sx1268_t *dev) {
@@ -692,7 +713,12 @@ sx1268_err_t SX1268_CalibrateImage(sx1268_t *dev, uint32_t freq_hz) {
         cal_freq[1] = 0x6FU; // stop
     }
 
-    return SX1268_SpiWriteCmd(dev, SX1268_CMD_CALIBRATE_IMAGE, cal_freq, 2U);
+    sx1268_err_t err = SX1268_SpiWriteCmd(dev, SX1268_CMD_CALIBRATE_IMAGE, cal_freq, 2U);
+	if(err != SX1268_OK) {
+		return err;
+	}
+
+	return SX1268_GetDeviceErrors(dev);
 }
 
 sx1268_err_t SX1268_SetRfFrequency(sx1268_t *dev, uint32_t freq_hz) {
@@ -1074,6 +1100,22 @@ sx1268_err_t SX1268_StartCad(sx1268_t *dev) {
 	dev->op_mode = SX1268_MODE_CAD;
 
 	return SX1268_OK;
+}
+
+// End a Lora channel activity detection scan
+sx1268_err_t SX1268_FinishCad(sx1268_t *dev, bool activity_detected, sx1268_cad_exit_mode_t exit_mode) {
+    if(dev == NULL) {
+        return SX1268_ERR_NULL_PTR;
+    }
+
+    if(activity_detected && (exit_mode == SX1268_CAD_EXIT_RX)) {
+        dev->op_mode = SX1268_MODE_RX;
+        return SX1268_OK;
+    }
+
+    SX1268_SetRxEnPin(dev, false);
+    dev->op_mode = SX1268_MODE_STDBY_RC;
+    return SX1268_OK;
 }
 
 // Compute LoRa packet Time-on-Air in milliseconds

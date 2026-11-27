@@ -399,6 +399,7 @@ uint32_t SX1268_GetRandomHardware(sx1268_t *dev);
 
 sx1268_err_t SX1268_ConfigureOptimalCad(sx1268_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t cad_timeout);
 sx1268_err_t SX1268_StartCad(sx1268_t *dev);
+sx1268_err_t SX1268_FinishCad(sx1268_t *dev, bool activity_detected, sx1268_cad_exit_mode_t exit_mode);
 
 uint32_t SX1268_GetLoraTimeOnAir(const sx1268_t *dev, uint8_t pkt_len);
 
