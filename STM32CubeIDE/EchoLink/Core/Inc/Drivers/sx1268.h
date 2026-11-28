@@ -334,7 +334,7 @@ typedef enum {
     SX1268_ERR_PA_RAMP,
     SX1268_ERR_BUFFER_OVERFLOW,
 	SX1268_ERR_MAX
-} sx1268_err_t;
+} sx1268_error_t;
 
 
 /* Main instance structure */
@@ -361,45 +361,45 @@ typedef struct {
 
 
 /* Prototypes */
-sx1268_err_t SX1268_Init(sx1268_t *dev);
-sx1268_err_t SX1268_Reset(sx1268_t *dev);
-sx1268_err_t SX1268_IsCommunicatingMcu(sx1268_t *dev);
-sx1268_err_t SX1268_CheckDeviceReady(sx1268_t *dev);
-sx1268_err_t SX1268_GetStatus(sx1268_t *dev);
-sx1268_err_t SX1268_GetDeviceErrors(sx1268_t *dev);
-sx1268_err_t SX1268_ClearDeviceErrors(sx1268_t *dev);
+sx1268_error_t SX1268_Init(sx1268_t *dev);
+sx1268_error_t SX1268_Reset(sx1268_t *dev);
+sx1268_error_t SX1268_IsCommunicatingMcu(sx1268_t *dev);
+sx1268_error_t SX1268_CheckDeviceReady(sx1268_t *dev);
+sx1268_error_t SX1268_GetStatus(sx1268_t *dev);
+sx1268_error_t SX1268_GetDeviceErrors(sx1268_t *dev);
+sx1268_error_t SX1268_ClearDeviceErrors(sx1268_t *dev);
 
-sx1268_err_t SX1268_SetSleep(sx1268_t *dev, bool warm_start);
-sx1268_err_t SX1268_SetStandby(sx1268_t *dev, sx1268_standby_mode_t mode);
-sx1268_err_t SX1268_SetFS(sx1268_t *dev);
-sx1268_err_t SX1268_SetTx(sx1268_t *dev, uint32_t timeout_rtc_steps);
-sx1268_err_t SX1268_SetRx(sx1268_t *dev, uint32_t timeout_rtc_steps, bool rx_boosted);
-sx1268_err_t SX1268_SetRxDutyCycle(sx1268_t *dev, uint32_t rx_steps, uint32_t sleep_steps);
-sx1268_err_t SX1268_SetTxContinuousWave(sx1268_t *dev);
+sx1268_error_t SX1268_SetSleep(sx1268_t *dev, bool warm_start);
+sx1268_error_t SX1268_SetStandby(sx1268_t *dev, sx1268_standby_mode_t mode);
+sx1268_error_t SX1268_SetFS(sx1268_t *dev);
+sx1268_error_t SX1268_SetTx(sx1268_t *dev, uint32_t timeout_rtc_steps);
+sx1268_error_t SX1268_SetRx(sx1268_t *dev, uint32_t timeout_rtc_steps, bool rx_boosted);
+sx1268_error_t SX1268_SetRxDutyCycle(sx1268_t *dev, uint32_t rx_steps, uint32_t sleep_steps);
+sx1268_error_t SX1268_SetTxContinuousWave(sx1268_t *dev);
 
 bool SX1268_CheckRfFrequency(uint32_t freq_hz);
-sx1268_err_t SX1268_SetRfFrequency(sx1268_t *dev, uint32_t freq_hz);
-sx1268_err_t SX1268_CalibrateImage(sx1268_t *dev, uint32_t freq_hz);
+sx1268_error_t SX1268_SetRfFrequency(sx1268_t *dev, uint32_t freq_hz);
+sx1268_error_t SX1268_CalibrateImage(sx1268_t *dev, uint32_t freq_hz);
 
-sx1268_err_t SX1268_SetTxParams(sx1268_t *dev, int8_t power_dbm, sx1268_ramp_time_t ramp_time);
-sx1268_err_t SX1268_SetLoraModulationParams(sx1268_t *dev, const sx1268_lora_mod_params_t *params);
-sx1268_err_t SX1268_SetLoraPacketParams(sx1268_t *dev, const sx1268_lora_pkt_params_t *params);
-sx1268_err_t SX1268_SetStopTimerOnPreamble(sx1268_t *dev, bool enable);
-sx1268_err_t SX1268_SetLoraSymbTimeout(sx1268_t *dev, uint8_t symb_num);
-sx1268_err_t SX1268_SetPublicNetwork(sx1268_t *dev, bool is_public);
+sx1268_error_t SX1268_SetTxParams(sx1268_t *dev, int8_t power_dbm, sx1268_ramp_time_t ramp_time);
+sx1268_error_t SX1268_SetLoraModulationParams(sx1268_t *dev, const sx1268_lora_mod_params_t *params);
+sx1268_error_t SX1268_SetLoraPacketParams(sx1268_t *dev, const sx1268_lora_pkt_params_t *params);
+sx1268_error_t SX1268_SetStopTimerOnPreamble(sx1268_t *dev, bool enable);
+sx1268_error_t SX1268_SetLoraSymbTimeout(sx1268_t *dev, uint8_t symb_num);
+sx1268_error_t SX1268_SetPublicNetwork(sx1268_t *dev, bool is_public);
 
-sx1268_err_t SX1268_SetDio1IrqParams(sx1268_t *dev, uint16_t irq_mask);
+sx1268_error_t SX1268_SetDio1IrqParams(sx1268_t *dev, uint16_t irq_mask);
 uint16_t SX1268_GetIrq(sx1268_t *dev);
 
-sx1268_err_t SX1268_SendPayload(sx1268_t *dev, const uint8_t *payload, uint8_t size, uint32_t timeout_rtc_steps);
-sx1268_err_t SX1268_GetPayload(sx1268_t *dev, uint8_t *buffer, uint8_t *size, uint8_t max_size);
-sx1268_err_t SX1268_GetLoraPacketStatus(sx1268_t *dev, sx1268_lora_pkt_status_t *pkt_status);
+sx1268_error_t SX1268_SendPayload(sx1268_t *dev, const uint8_t *payload, uint8_t size, uint32_t timeout_rtc_steps);
+sx1268_error_t SX1268_GetPayload(sx1268_t *dev, uint8_t *buffer, uint8_t *size, uint8_t max_size);
+sx1268_error_t SX1268_GetLoraPacketStatus(sx1268_t *dev, sx1268_lora_pkt_status_t *pkt_status);
 int8_t SX1268_GetRssiInstant(sx1268_t *dev);
 uint32_t SX1268_GetRandomHardware(sx1268_t *dev);
 
-sx1268_err_t SX1268_ConfigureOptimalCad(sx1268_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t cad_timeout);
-sx1268_err_t SX1268_StartCad(sx1268_t *dev);
-sx1268_err_t SX1268_FinishCad(sx1268_t *dev, bool activity_detected, sx1268_cad_exit_mode_t exit_mode);
+sx1268_error_t SX1268_ConfigureOptimalCad(sx1268_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t cad_timeout);
+sx1268_error_t SX1268_StartCad(sx1268_t *dev);
+sx1268_error_t SX1268_FinishCad(sx1268_t *dev, bool activity_detected, sx1268_cad_exit_mode_t exit_mode);
 
 uint32_t SX1268_GetLoraTimeOnAir(const sx1268_t *dev, uint8_t pkt_len);
 

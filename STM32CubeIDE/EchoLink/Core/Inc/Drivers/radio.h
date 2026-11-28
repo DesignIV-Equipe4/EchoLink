@@ -54,7 +54,7 @@ typedef enum {
     RADIO_ERR_RF_FAULT,
     RADIO_ERR_BUFFER_OVERFLOW,
 	RADIO_ERR_MAX
-} radio_err_t;
+} radio_error_t;
 
 /* Configuration */
 typedef struct {
@@ -101,15 +101,15 @@ typedef struct {
 
 
 /* Prototypes */
-radio_err_t Radio_Init(radio_t *dev, const radio_events_t *events);
+radio_error_t Radio_Init(radio_t *dev, const radio_events_t *events);
 radio_state_t Radio_GetStatus(radio_t *dev);
-radio_err_t Radio_WakeupInit(radio_t *dev, const radio_events_t *events, const radio_lora_config_t *cfg);
+radio_error_t Radio_WakeupInit(radio_t *dev, const radio_events_t *events, const radio_lora_config_t *cfg);
 
-radio_err_t Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg);
-radio_err_t Radio_SetChannel(radio_t *dev, uint32_t freq_hz);
-radio_err_t Radio_SetTxPower(radio_t *dev, int8_t power_dbm);
-radio_err_t Radio_SetPublicNetwork(radio_t *dev, bool is_public);
-radio_err_t Radio_SetMaxPayloadLength(radio_t *dev, uint8_t max_len);
+radio_error_t Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg);
+radio_error_t Radio_SetChannel(radio_t *dev, uint32_t freq_hz);
+radio_error_t Radio_SetTxPower(radio_t *dev, int8_t power_dbm);
+radio_error_t Radio_SetPublicNetwork(radio_t *dev, bool is_public);
+radio_error_t Radio_SetMaxPayloadLength(radio_t *dev, uint8_t max_len);
 
 bool Radio_CheckRfFrequency(uint32_t freq_hz);
 uint32_t Radio_GetTimeOnAir(radio_t *dev, uint8_t pkt_len);
@@ -119,22 +119,22 @@ bool Radio_IsChannelFree(radio_t *dev, uint32_t freq_hz, int16_t rssi_thresh_dbm
 uint32_t Radio_GetRandom(radio_t *dev);
 bool Radio_IsDio1High(radio_t *dev);
 
-radio_err_t Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size);
-radio_err_t Radio_Receive(radio_t *dev, uint32_t timeout_ms, bool boosted);
-radio_err_t Radio_SendAdaptive(radio_t *dev, const uint8_t *buffer, uint8_t size, int8_t link_rssi_dbm, int8_t link_snr_db);
-radio_err_t Radio_ReceiveAdaptive(radio_t *dev, uint32_t timeout_ms, int8_t last_rssi_dbm, int8_t last_snr_db);
+radio_error_t Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size);
+radio_error_t Radio_Receive(radio_t *dev, uint32_t timeout_ms, bool boosted);
+radio_error_t Radio_SendAdaptive(radio_t *dev, const uint8_t *buffer, uint8_t size, int8_t link_rssi_dbm, int8_t link_snr_db);
+radio_error_t Radio_ReceiveAdaptive(radio_t *dev, uint32_t timeout_ms, int8_t last_rssi_dbm, int8_t last_snr_db);
 
-radio_err_t Radio_StartCad(radio_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t rx_timeout_ms);
-radio_err_t Radio_SetRxDutyCycle(radio_t *dev, uint32_t rx_time_ms, uint32_t sleep_time_ms);
-radio_err_t Radio_SetTxContinuousWave(radio_t *dev, uint32_t freq_hz, int8_t power_dbm);
+radio_error_t Radio_StartCad(radio_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t rx_timeout_ms);
+radio_error_t Radio_SetRxDutyCycle(radio_t *dev, uint32_t rx_time_ms, uint32_t sleep_time_ms);
+radio_error_t Radio_SetTxContinuousWave(radio_t *dev, uint32_t freq_hz, int8_t power_dbm);
 
-radio_err_t Radio_Sleep(radio_t *dev);
-radio_err_t Radio_Standby(radio_t *dev);
+radio_error_t Radio_Sleep(radio_t *dev);
+radio_error_t Radio_Standby(radio_t *dev);
 int8_t Radio_GetRssiInstant(radio_t *dev);
 
 /* Interrupt handling */
 void Radio_OnDio1Irq(radio_t *dev);
-radio_err_t Radio_IrqProcess(radio_t *dev);
+radio_error_t Radio_IrqProcess(radio_t *dev);
 
 
 #endif /* INC_DRIVERS_RADIO_H */

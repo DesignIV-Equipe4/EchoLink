@@ -30,7 +30,7 @@ static uint32_t BMS_ReadU32BigEndian(const uint8_t *buf) {
            ((uint32_t)buf[3]);
 }
 
-static bms_status_t BMS_MapStatus(HAL_StatusTypeDef hal_error, bool is_tx) {
+static bms_error_t BMS_MapStatus(HAL_StatusTypeDef hal_error, bool is_tx) {
     switch (hal_error) {
         case HAL_OK:
             return BMS_OK;
@@ -51,7 +51,7 @@ static void BMS_FlushRx(UART_HandleTypeDef *huart) {
     __HAL_UART_FLUSH_DRREGISTER(huart);
 }
 
-static bms_status_t BMS_ValidateFrame(const uint8_t *rx, bms_cmd_t expected_cmd) {
+static bms_error_t BMS_ValidateFrame(const uint8_t *rx, bms_cmd_t expected_cmd) {
 	if((expected_cmd >= BMS_CMD_MAX) || (expected_cmd < BMS_CMD_SOC_VOLT_CURR)) {
 		return BMS_ERR_INVALID_PARAM;
 	}
@@ -75,7 +75,7 @@ static bms_status_t BMS_ValidateFrame(const uint8_t *rx, bms_cmd_t expected_cmd)
     return BMS_OK;
 }
 
-static bms_status_t BMS_SendCommand(bms_t *bms, bms_cmd_t cmd) {
+static bms_error_t BMS_SendCommand(bms_t *bms, bms_cmd_t cmd) {
 	if((bms == NULL) || (bms->huart == NULL)) {
 		return BMS_ERR_INVALID_PARAM;
 	}
@@ -97,7 +97,7 @@ static bms_status_t BMS_SendCommand(bms_t *bms, bms_cmd_t cmd) {
     return BMS_MapStatus(hal_err, true);
 }
 
-static bms_status_t BMS_TransceiveSingle(bms_t *bms, bms_cmd_t cmd, uint8_t rx_data[8]) {
+static bms_error_t BMS_TransceiveSingle(bms_t *bms, bms_cmd_t cmd, uint8_t rx_data[8]) {
 	if((bms == NULL) || (bms->huart == NULL) || (rx_data == NULL)) {
 		return BMS_ERR_NULL_PTR;
 	}
@@ -105,7 +105,7 @@ static bms_status_t BMS_TransceiveSingle(bms_t *bms, bms_cmd_t cmd, uint8_t rx_d
 		return BMS_ERR_INVALID_PARAM;
 	}
 
-	bms_status_t err = BMS_SendCommand(bms, cmd);
+	bms_error_t err = BMS_SendCommand(bms, cmd);
     if(err != BMS_OK) {
         return err;
     }
@@ -127,7 +127,7 @@ static bms_status_t BMS_TransceiveSingle(bms_t *bms, bms_cmd_t cmd, uint8_t rx_d
 }
 
 
-bms_status_t BMS_Init(bms_t *bms) {
+bms_error_t BMS_Init(bms_t *bms) {
 	if((bms == NULL) || (bms->huart == NULL)) {
 		return BMS_ERR_NULL_PTR;
 	}
@@ -139,9 +139,9 @@ bms_status_t BMS_Init(bms_t *bms) {
     return BMS_OK;
 }
 
-bms_status_t BMS_GetSocVoltageCurrent(bms_t *bms) {
+bms_error_t BMS_GetSocVoltageCurrent(bms_t *bms) {
     uint8_t d[8];
-    bms_status_t err = BMS_TransceiveSingle(bms, BMS_CMD_SOC_VOLT_CURR, d);
+    bms_error_t err = BMS_TransceiveSingle(bms, BMS_CMD_SOC_VOLT_CURR, d);
     if(err != BMS_OK) {
         return err;
     }
@@ -154,9 +154,9 @@ bms_status_t BMS_GetSocVoltageCurrent(bms_t *bms) {
     return BMS_OK;
 }
 
-bms_status_t BMS_GetMinMaxVoltage(bms_t *bms) {
+bms_error_t BMS_GetMinMaxVoltage(bms_t *bms) {
     uint8_t d[8];
-    bms_status_t err = BMS_TransceiveSingle(bms, BMS_CMD_MIN_MAX_VOLT, d);
+    bms_error_t err = BMS_TransceiveSingle(bms, BMS_CMD_MIN_MAX_VOLT, d);
     if(err != BMS_OK) {
         return err;
     }
@@ -169,9 +169,9 @@ bms_status_t BMS_GetMinMaxVoltage(bms_t *bms) {
     return BMS_OK;
 }
 
-bms_status_t BMS_GetMinMaxTemp(bms_t *bms) {
+bms_error_t BMS_GetMinMaxTemp(bms_t *bms) {
     uint8_t d[8];
-    bms_status_t err = BMS_TransceiveSingle(bms, BMS_CMD_MIN_MAX_TEMP, d);
+    bms_error_t err = BMS_TransceiveSingle(bms, BMS_CMD_MIN_MAX_TEMP, d);
     if(err != BMS_OK) {
         return err;
     }
@@ -184,9 +184,9 @@ bms_status_t BMS_GetMinMaxTemp(bms_t *bms) {
     return BMS_OK;
 }
 
-bms_status_t BMS_GetMosStatus(bms_t *bms) {
+bms_error_t BMS_GetMosStatus(bms_t *bms) {
     uint8_t d[8];
-    bms_status_t err = BMS_TransceiveSingle(bms, BMS_CMD_MOS_STATUS, d);
+    bms_error_t err = BMS_TransceiveSingle(bms, BMS_CMD_MOS_STATUS, d);
     if(err != BMS_OK) {
         return err;
     }
@@ -200,9 +200,9 @@ bms_status_t BMS_GetMosStatus(bms_t *bms) {
     return BMS_OK;
 }
 
-bms_status_t BMS_GetGenericStatus(bms_t *bms) {
+bms_error_t BMS_GetGenericStatus(bms_t *bms) {
     uint8_t d[8];
-    bms_status_t err = BMS_TransceiveSingle(bms, BMS_CMD_GENERIC_STATUS, d);
+    bms_error_t err = BMS_TransceiveSingle(bms, BMS_CMD_GENERIC_STATUS, d);
     if(err != BMS_OK) {
         return err;
     }
@@ -217,9 +217,9 @@ bms_status_t BMS_GetGenericStatus(bms_t *bms) {
     return BMS_OK;
 }
 
-bms_status_t BMS_GetCellVoltages(bms_t *bms) {
+bms_error_t BMS_GetCellVoltages(bms_t *bms) {
     if(bms->data.cell_count == 0U) {
-    	bms_status_t err = BMS_GetGenericStatus(bms);
+    	bms_error_t err = BMS_GetGenericStatus(bms);
 		if(err != BMS_OK) {
 			return err;
 		}
@@ -233,7 +233,7 @@ bms_status_t BMS_GetCellVoltages(bms_t *bms) {
         expected_frames = 16U;
     }
 
-    bms_status_t err = BMS_SendCommand(bms, BMS_CMD_CELL_VOLTAGES);
+    bms_error_t err = BMS_SendCommand(bms, BMS_CMD_CELL_VOLTAGES);
     if(err != BMS_OK) {
         return err;
     }
@@ -244,7 +244,7 @@ bms_status_t BMS_GetCellVoltages(bms_t *bms) {
         if(hal_err != HAL_OK) {
             return BMS_MapStatus(hal_err, false);
         }
-        bms_status_t err = BMS_ValidateFrame(rx, BMS_CMD_CELL_VOLTAGES);
+        bms_error_t err = BMS_ValidateFrame(rx, BMS_CMD_CELL_VOLTAGES);
         if(err != BMS_OK) {
             return err;
         }
@@ -267,9 +267,9 @@ bms_status_t BMS_GetCellVoltages(bms_t *bms) {
     return BMS_OK;
 }
 
-bms_status_t BMS_GetCellTemps(bms_t *bms) {
+bms_error_t BMS_GetCellTemps(bms_t *bms) {
 	if(bms->data.temp_sensor_count == 0U) {
-		bms_status_t err = BMS_GetGenericStatus(bms);
+		bms_error_t err = BMS_GetGenericStatus(bms);
 		if(err != BMS_OK) {
 			return err;
 		}
@@ -283,7 +283,7 @@ bms_status_t BMS_GetCellTemps(bms_t *bms) {
         expected_frames = 3U;
     }
 
-    bms_status_t err = BMS_SendCommand(bms, BMS_CMD_CELL_TEMPS);
+    bms_error_t err = BMS_SendCommand(bms, BMS_CMD_CELL_TEMPS);
     if(err != BMS_OK) {
         return err;
     }
@@ -316,9 +316,9 @@ bms_status_t BMS_GetCellTemps(bms_t *bms) {
     return BMS_OK;
 }
 
-bms_status_t BMS_GetCellBalance(bms_t *bms) {
+bms_error_t BMS_GetCellBalance(bms_t *bms) {
     uint8_t d[8];
-    bms_status_t err = BMS_TransceiveSingle(bms, BMS_CMD_CELL_BALANCE, d);
+    bms_error_t err = BMS_TransceiveSingle(bms, BMS_CMD_CELL_BALANCE, d);
     if(err != BMS_OK) {
         return err;
     }
@@ -332,9 +332,9 @@ bms_status_t BMS_GetCellBalance(bms_t *bms) {
     return BMS_OK;
 }
 
-bms_status_t BMS_GetFailureStatus(bms_t *bms) {
+bms_error_t BMS_GetFailureStatus(bms_t *bms) {
     uint8_t d[8];
-    bms_status_t err = BMS_TransceiveSingle(bms, BMS_CMD_FALURE_STATUS, d);
+    bms_error_t err = BMS_TransceiveSingle(bms, BMS_CMD_FALURE_STATUS, d);
     if(err != BMS_OK) {
         return err;
     }
@@ -352,7 +352,7 @@ bms_status_t BMS_GetFailureStatus(bms_t *bms) {
 }
 
 // TODO: add errors listing instead of simply return BMS_OK
-bms_status_t BMS_UpdateAll(bms_t *bms) {
+bms_error_t BMS_UpdateAll(bms_t *bms) {
     if(BMS_GetGenericStatus(bms) != BMS_OK)		return BMS_OK;
     if(BMS_GetSocVoltageCurrent(bms) != BMS_OK) return BMS_OK;
     if(BMS_GetMinMaxVoltage(bms) != BMS_OK)     return BMS_OK;

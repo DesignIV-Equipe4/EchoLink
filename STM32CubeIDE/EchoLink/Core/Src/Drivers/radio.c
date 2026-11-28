@@ -50,7 +50,7 @@ static int8_t Radio_GetLoraSnrFloor(sx1268_lora_sf_t sf) {
     }
 }
 
-static radio_err_t Radio_MapError(sx1268_err_t err) {
+static radio_error_t Radio_MapError(sx1268_error_t err) {
 	if(err >= SX1268_ERR_MAX) return RADIO_ERR_MAX;
 
     switch(err) {
@@ -158,10 +158,10 @@ static uint8_t Radio_ComputeLdro(sx1268_lora_sf_t sf, sx1268_lora_bw_t bw) {
 }
 
 // Internal helper to configure RX interrupts, convert timeout to RTC steps, and start RX
-static radio_err_t Radio_StartRxInternal(radio_t *dev, uint32_t timeout_ms, bool boosted) {
+static radio_error_t Radio_StartRxInternal(radio_t *dev, uint32_t timeout_ms, bool boosted) {
     // Enable RX Done, CRC Error, Header Error, and Timeout interrupts on DIO1
     const uint16_t rx_irq_mask = (uint16_t)(SX1268_IRQ_RX_DONE | SX1268_IRQ_CRC_ERROR | SX1268_IRQ_HEADER_ERROR | SX1268_IRQ_RX_TX_TIMEOUT);
-    sx1268_err_t sx_err = SX1268_SetDio1IrqParams(&dev->sx1268, rx_irq_mask);
+    sx1268_error_t sx_err = SX1268_SetDio1IrqParams(&dev->sx1268, rx_irq_mask);
     if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
 	}
@@ -237,7 +237,7 @@ bool Radio_ComputeAdaptiveRxBoost(radio_t *dev, bool current_boosted, int8_t rss
 }
 
 
-radio_err_t Radio_Init(radio_t *dev, const radio_events_t *events) {
+radio_error_t Radio_Init(radio_t *dev, const radio_events_t *events) {
     if(dev == NULL) {
         return RADIO_ERR_NULL_PTR;
     }
@@ -256,7 +256,7 @@ radio_err_t Radio_Init(radio_t *dev, const radio_events_t *events) {
 	dev->rx_boosted           = true;
 	dev->cad_pending_after_rx = false;
 
-	sx1268_err_t sx_err = SX1268_Init(&dev->sx1268);
+	sx1268_error_t sx_err = SX1268_Init(&dev->sx1268);
 	if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
 	}
@@ -283,7 +283,7 @@ radio_state_t Radio_GetStatus(radio_t *dev) {
 }
 
 // Hot-start initialization and restores STM32 context on sys_wkup pin
-radio_err_t Radio_WakeupInit(radio_t *dev, const radio_events_t *events, const radio_lora_config_t *cfg) {
+radio_error_t Radio_WakeupInit(radio_t *dev, const radio_events_t *events, const radio_lora_config_t *cfg) {
     if((dev == NULL) && (cfg == NULL)) {
         return RADIO_ERR_NULL_PTR;
     }
@@ -324,13 +324,13 @@ radio_err_t Radio_WakeupInit(radio_t *dev, const radio_events_t *events, const r
 
 // Configure LoRa link parameters
 //TODO: add errors
-radio_err_t Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg) {
+radio_error_t Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg) {
     if((dev == NULL) && (cfg == NULL)) {
         return RADIO_ERR_NULL_PTR;
     }
 
-    radio_err_t err = RADIO_OK;
-    sx1268_err_t sx_err = SX1268_OK;
+    radio_error_t err = RADIO_OK;
+    sx1268_error_t sx_err = SX1268_OK;
     // Configuration must be performed in Standby mode
     err = Radio_Standby(dev);
     if(err != RADIO_OK) {
@@ -403,7 +403,7 @@ radio_err_t Radio_ConfigureLora(radio_t *dev, const radio_lora_config_t *cfg) {
 }
 
 // Change RF carrier frequency
-radio_err_t Radio_SetChannel(radio_t *dev, uint32_t freq_hz) {
+radio_error_t Radio_SetChannel(radio_t *dev, uint32_t freq_hz) {
 	if(!SX1268_CheckRfFrequency(freq_hz)) {
 		return RADIO_ERR_INVALID_FREQ;
 	}
@@ -412,13 +412,13 @@ radio_err_t Radio_SetChannel(radio_t *dev, uint32_t freq_hz) {
 }
 
 // Change TX output power setpoint (manually)
-radio_err_t Radio_SetTxPower(radio_t *dev, int8_t power_dbm) {
+radio_error_t Radio_SetTxPower(radio_t *dev, int8_t power_dbm) {
     if(dev == NULL) {
         return RADIO_ERR_NULL_PTR;
     }
 
     int8_t safe_pwr = Radio_ClampPower(power_dbm);
-    sx1268_err_t sx_err = SX1268_SetTxParams(&dev->sx1268, safe_pwr, SX1268_RAMP_200_US);
+    sx1268_error_t sx_err = SX1268_SetTxParams(&dev->sx1268, safe_pwr, SX1268_RAMP_200_US);
     if(sx_err != SX1268_OK) {
         return Radio_MapError(sx_err);
     }
@@ -428,12 +428,12 @@ radio_err_t Radio_SetTxPower(radio_t *dev, int8_t power_dbm) {
 }
 
 // Switch between Public and Private LoRa SyncWord
-radio_err_t Radio_SetPublicNetwork(radio_t *dev, bool is_public) {
+radio_error_t Radio_SetPublicNetwork(radio_t *dev, bool is_public) {
 	return Radio_MapError(SX1268_SetPublicNetwork(&dev->sx1268, is_public));
 }
 
 // Update maximum payload length in LoRa packet
-radio_err_t Radio_SetMaxPayloadLength(radio_t *dev, uint8_t max_len) {
+radio_error_t Radio_SetMaxPayloadLength(radio_t *dev, uint8_t max_len) {
     if(dev == NULL) {
         return RADIO_ERR_NULL_PTR;
     }
@@ -441,7 +441,7 @@ radio_err_t Radio_SetMaxPayloadLength(radio_t *dev, uint8_t max_len) {
     sx1268_lora_pkt_params_t next_pkt = dev->sx1268.lora_pkt;
     next_pkt.payload_len = max_len;
 
-    sx1268_err_t sx_err = SX1268_SetLoraPacketParams(&dev->sx1268, &next_pkt);
+    sx1268_error_t sx_err = SX1268_SetLoraPacketParams(&dev->sx1268, &next_pkt);
     if(sx_err != SX1268_OK) {
         return Radio_MapError(sx_err);
     }
@@ -518,7 +518,7 @@ bool Radio_IsDio1High(radio_t *dev) {
 }
 
 // Load payload into FIFO and start non-blocking packet transmission (manually)
-radio_err_t Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size) {
+radio_error_t Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size) {
     if((dev == NULL) || buffer == NULL) {
         return RADIO_ERR_NULL_PTR;
     }
@@ -526,7 +526,7 @@ radio_err_t Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size) {
     	return RADIO_ERR_INVALID_PARAM;
     }
 
-    sx1268_err_t sx_err = SX1268_OK;
+    sx1268_error_t sx_err = SX1268_OK;
     // Route TX Done and Timeout interrupts to DIO1
     const uint16_t tx_irq_mask = (uint16_t)(SX1268_IRQ_TX_DONE | SX1268_IRQ_RX_TX_TIMEOUT);
     sx_err = SX1268_SetDio1IrqParams(&dev->sx1268, tx_irq_mask);
@@ -546,7 +546,7 @@ radio_err_t Radio_Send(radio_t *dev, const uint8_t *buffer, uint8_t size) {
 }
 
 // Start packet reception with standard power-saving LNA gain (manually)
-radio_err_t Radio_Receive(radio_t *dev, uint32_t timeout_ms, bool boosted) {
+radio_error_t Radio_Receive(radio_t *dev, uint32_t timeout_ms, bool boosted) {
     if(dev == NULL) {
         return RADIO_ERR_NULL_PTR;
     }
@@ -557,14 +557,14 @@ radio_err_t Radio_Receive(radio_t *dev, uint32_t timeout_ms, bool boosted) {
 /* Start packet reception with standard power-saving LNA gain (adaptive).
  * Use after a valid rx_done with rssi_dbm/snr_db from 1 Radio_Send call
  */
-radio_err_t Radio_SendAdaptive(radio_t *dev, const uint8_t *buffer, uint8_t size, int8_t link_rssi_dbm, int8_t link_snr_db) {
+radio_error_t Radio_SendAdaptive(radio_t *dev, const uint8_t *buffer, uint8_t size, int8_t link_rssi_dbm, int8_t link_snr_db) {
     if((dev == NULL) || (buffer == NULL)) {
         return RADIO_ERR_NULL_PTR;
     }
 
     int8_t target_pwr = Radio_ComputeAdaptiveTxPower(dev, dev->tx_power_dbm, link_rssi_dbm, link_snr_db);
     if(target_pwr != dev->tx_power_dbm) {
-        radio_err_t err = Radio_SetTxPower(dev, target_pwr);
+        radio_error_t err = Radio_SetTxPower(dev, target_pwr);
         if(err != RADIO_OK) {
             return err;
         }
@@ -576,13 +576,13 @@ radio_err_t Radio_SendAdaptive(radio_t *dev, const uint8_t *buffer, uint8_t size
 /* Load payload into FIFO and start non-blocking packet transmission (adaptive)
  * Use after a valid rx_done with rssi_dbm/snr_db from 1 Radio_Receive call
  */
-radio_err_t Radio_ReceiveAdaptive(radio_t *dev, uint32_t timeout_ms, int8_t last_rssi_dbm, int8_t last_snr_db) {
+radio_error_t Radio_ReceiveAdaptive(radio_t *dev, uint32_t timeout_ms, int8_t last_rssi_dbm, int8_t last_snr_db) {
     if(dev == NULL) {
         return RADIO_ERR_NULL_PTR;
     }
 
     bool target_boost = Radio_ComputeAdaptiveRxBoost(dev, dev->rx_boosted, last_rssi_dbm, last_snr_db);
-    radio_err_t err = Radio_StartRxInternal(dev, timeout_ms, target_boost);
+    radio_error_t err = Radio_StartRxInternal(dev, timeout_ms, target_boost);
     if(err != RADIO_OK) {
         return err;
     }
@@ -592,9 +592,9 @@ radio_err_t Radio_ReceiveAdaptive(radio_t *dev, uint32_t timeout_ms, int8_t last
 }
 
 // Start a LoRa Channel Activity Detection scan
-radio_err_t Radio_StartCad(radio_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t rx_timeout_ms) {
+radio_error_t Radio_StartCad(radio_t *dev, sx1268_cad_exit_mode_t exit_mode, uint32_t rx_timeout_ms) {
     // Enable both CAD and RX interrupts
-	sx1268_err_t sx_err = SX1268_OK;
+	sx1268_error_t sx_err = SX1268_OK;
     const uint16_t cad_irq_mask = (uint16_t)(SX1268_IRQ_CAD_DONE | SX1268_IRQ_CAD_ACTIVITY_DETECTED | SX1268_IRQ_RX_DONE | SX1268_IRQ_CRC_ERROR | SX1268_IRQ_HEADER_ERROR | SX1268_IRQ_RX_TX_TIMEOUT);
     sx_err = SX1268_SetDio1IrqParams(&dev->sx1268, cad_irq_mask);
     if(sx_err != SX1268_OK) {
@@ -620,9 +620,9 @@ radio_err_t Radio_StartCad(radio_t *dev, sx1268_cad_exit_mode_t exit_mode, uint3
 }
 
 // Start autonomous hardware RX / Sleep duty-cycled reception (sniff mode)
-radio_err_t Radio_SetRxDutyCycle(radio_t *dev, uint32_t rx_time_ms, uint32_t sleep_time_ms) {
+radio_error_t Radio_SetRxDutyCycle(radio_t *dev, uint32_t rx_time_ms, uint32_t sleep_time_ms) {
     const uint16_t rx_irq_mask = (uint16_t)(SX1268_IRQ_RX_DONE | SX1268_IRQ_CRC_ERROR | SX1268_IRQ_HEADER_ERROR | SX1268_IRQ_RX_TX_TIMEOUT);
-    sx1268_err_t sx_err = SX1268_SetDio1IrqParams(&dev->sx1268, rx_irq_mask);
+    sx1268_error_t sx_err = SX1268_SetDio1IrqParams(&dev->sx1268, rx_irq_mask);
     if(sx_err != SX1268_OK) {
     	return Radio_MapError(sx_err);
     }
@@ -641,11 +641,11 @@ radio_err_t Radio_SetRxDutyCycle(radio_t *dev, uint32_t rx_time_ms, uint32_t sle
 }
 
 // Transmit an unmodulated continuous wave carrier (RF bench testing)
-radio_err_t Radio_SetTxContinuousWave(radio_t *dev, uint32_t freq_hz, int8_t power_dbm) {
+radio_error_t Radio_SetTxContinuousWave(radio_t *dev, uint32_t freq_hz, int8_t power_dbm) {
 	if(!SX1268_CheckRfFrequency(freq_hz)) {
 		return RADIO_ERR_INVALID_FREQ;
 	}
-	sx1268_err_t sx_err = SX1268_SetRfFrequency(&dev->sx1268, freq_hz);
+	sx1268_error_t sx_err = SX1268_SetRfFrequency(&dev->sx1268, freq_hz);
     if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
 	}
@@ -660,8 +660,8 @@ radio_err_t Radio_SetTxContinuousWave(radio_t *dev, uint32_t freq_hz, int8_t pow
 }
 
 // Put radio into low-power Sleep mode with configuration retention (warm start)
-radio_err_t Radio_Sleep(radio_t *dev) {
-	sx1268_err_t sx_err = SX1268_SetSleep(&dev->sx1268, true);
+radio_error_t Radio_Sleep(radio_t *dev) {
+	sx1268_error_t sx_err = SX1268_SetSleep(&dev->sx1268, true);
     if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
 	}
@@ -671,8 +671,8 @@ radio_err_t Radio_Sleep(radio_t *dev) {
 }
 
 // Put radio into Standby RC mode
-radio_err_t Radio_Standby(radio_t *dev) {
-	sx1268_err_t sx_err = SX1268_SetStandby(&dev->sx1268, SX1268_STDBY_RC);
+radio_error_t Radio_Standby(radio_t *dev) {
+	sx1268_error_t sx_err = SX1268_SetStandby(&dev->sx1268, SX1268_STDBY_RC);
     if(sx_err != SX1268_OK) {
     	return Radio_MapError(sx_err);
     }
@@ -691,7 +691,7 @@ void Radio_OnDio1Irq(radio_t *dev) {
     dev->irq_fired = true;
 }
 
-radio_err_t Radio_IrqProcess(radio_t *dev) {
+radio_error_t Radio_IrqProcess(radio_t *dev) {
 	if((!dev->irq_fired) && (!Radio_IsDio1High(dev))) {
 		return RADIO_OK; // No available interrupt
 	}
@@ -700,7 +700,7 @@ radio_err_t Radio_IrqProcess(radio_t *dev) {
 
     // Fetch and clear hardware IRQ status
     uint16_t irq_regs = SX1268_IRQ_NONE;
-    sx1268_err_t sx_err = SX1268_GetIrq(&dev->sx1268);
+    sx1268_error_t sx_err = SX1268_GetIrq(&dev->sx1268);
     if(sx_err != SX1268_OK) {
 		return Radio_MapError(sx_err);
 	}

@@ -45,7 +45,7 @@ typedef enum {
     BMS_ERR_CHECKSUM,
     BMS_ERR_INVALID_FRAME_IDX,
     BMS_ERR_NO_CONFIG
-} bms_status_t;
+} bms_error_t;
 
 typedef enum {
     BMS_CMD_SOC_VOLT_CURR  	= 0x90U,	// SOC, voltage and current
@@ -125,19 +125,19 @@ typedef struct {
 } bms_t;
 
 
-bms_status_t BMS_Init(bms_t *bms);
+bms_error_t BMS_Init(bms_t *bms);
 
-bms_status_t BMS_GetSocVoltageCurrent(bms_t *bms);
-bms_status_t BMS_GetMinMaxVoltage(bms_t *bms);
-bms_status_t BMS_GetMinMaxTemp(bms_t *bms);
-bms_status_t BMS_GetMosStatus(bms_t *bms);
-bms_status_t BMS_GetGenericStatus(bms_t *bms);
-bms_status_t BMS_GetCellVoltages(bms_t *bms);
-bms_status_t BMS_GetCellTemps(bms_t *bms);
-bms_status_t BMS_GetCellBalance(bms_t *bms);
-bms_status_t BMS_GetFailureStatus(bms_t *bms);
+bms_error_t BMS_GetSocVoltageCurrent(bms_t *bms);
+bms_error_t BMS_GetMinMaxVoltage(bms_t *bms);
+bms_error_t BMS_GetMinMaxTemp(bms_t *bms);
+bms_error_t BMS_GetMosStatus(bms_t *bms);
+bms_error_t BMS_GetGenericStatus(bms_t *bms);
+bms_error_t BMS_GetCellVoltages(bms_t *bms);
+bms_error_t BMS_GetCellTemps(bms_t *bms);
+bms_error_t BMS_GetCellBalance(bms_t *bms);
+bms_error_t BMS_GetFailureStatus(bms_t *bms);
 
-bms_status_t BMS_UpdateAll(bms_t *bms);
+bms_error_t BMS_UpdateAll(bms_t *bms);
 bool BMS_IsCellBalancing(const bms_t *bms, uint8_t cell_index_1_to_48);
 
 

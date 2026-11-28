@@ -13,9 +13,9 @@ typedef enum {
 } isow1044_mode_t;
 
 typedef enum {
-	ISOW1044_ERROR_CAN = 0,
-	ISOW1044_ERROR_DEV,
-	ISOW1044_ERROR_MAX
+	ISOW1044_ERR_CAN = 0,
+	ISOW1044_ERR_DEV,
+	ISOW1044_ERR_MAX
 } isow1044_error_t;
 
 typedef struct {
