@@ -13,8 +13,10 @@ typedef enum {
 } isow1044_mode_t;
 
 typedef enum {
-	ISOW1044_ERR_CAN = 0,
-	ISOW1044_ERR_DEV,
+	ISOW1044_OK = 0,
+	ISOW1044_ERR_NULL_PTR,
+	ISOW1044_ERR_CAN,
+	ISOW1044_ERR_CMD,
 	ISOW1044_ERR_MAX
 } isow1044_error_t;
 
@@ -37,7 +39,7 @@ void ISOW1044_EnableDcdc(isow1044_t *dev, bool enable);
 bool ISOW1044_IsFaultActive(isow1044_t *dev);
 void ISOW1044_SetNodeId(isow1044_t *dev, uint8_t id);
 
-HAL_StatusTypeDef ISOW1044_SendCommand(isow1044_t *dev, uint32_t std_id, uint8_t *tx_data, uint8_t length);
+isow1044_error_t ISOW1044_Send(isow1044_t *dev, uint32_t std_id, uint8_t *tx_data, uint8_t length);
 
 // Callback
 bool ISOW1044_ReceiveFrame(CAN_HandleTypeDef *hcan, CAN_RxHeaderTypeDef *rx_header, uint8_t *rx_data);

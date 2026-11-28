@@ -8,7 +8,7 @@
 
 isow1044_error_t ISOW1044_Init(isow1044_t *dev) {
     if(dev == NULL || dev->hcan == NULL) {
-        return ISOW1044_ERROR_DEV;
+        return ISOW1044_ERR_NULL_PTR;
     }
 
     ISOW1044_EnableDcdc(dev, dev->dcdc_on);
@@ -38,14 +38,19 @@ isow1044_error_t ISOW1044_Init(isow1044_t *dev) {
     can_filter.SlaveStartFilterBank = 14;
 
     if(HAL_CAN_ConfigFilter(dev->hcan, &can_filter) != HAL_OK) {
-        return ISOW1044_ERROR_CAN;
+        return ISOW1044_ERR_CAN;
     }
 
     if(HAL_CAN_Start(dev->hcan) != HAL_OK) {
-        return ISOW1044_ERROR_CAN;
+        return ISOW1044_ERR_CAN;
     }
 
-    return HAL_CAN_ActivateNotification(dev->hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+    HAL_StatusTypeDef hal_err = HAL_CAN_ActivateNotification(dev->hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+    if(hal_err != HAL_OK) {
+    	return ISOW1044_ERR_CAN;
+    }
+
+    return ISOW1044_OK;
 }
 
 
@@ -79,9 +84,9 @@ void ISOW1044_SetNodeId(isow1044_t *dev, uint8_t id) {
 	dev->local_node_id = id;
 }
 
-HAL_StatusTypeDef ISOW1044_SendCommand(isow1044_t *dev, uint32_t std_id, uint8_t *tx_data, uint8_t length) {
+isow1044_error_t ISOW1044_Send(isow1044_t *dev, uint32_t std_id, uint8_t *tx_data, uint8_t length) {
 	if(tx_data == NULL) {
-		return HAL_ERROR;
+		return ISOW1044_ERR_NULL_PTR;
 	}
 
 	CAN_TxHeaderTypeDef tx_header = {0};
@@ -96,10 +101,15 @@ HAL_StatusTypeDef ISOW1044_SendCommand(isow1044_t *dev, uint32_t std_id, uint8_t
 
 	// Check available mailbox transmissions
 	if(HAL_CAN_GetTxMailboxesFreeLevel(dev->hcan) == 0) {
-		return HAL_BUSY;
+		return ISOW1044_OK; // Busy
 	}
 
-	return HAL_CAN_AddTxMessage(dev->hcan, &tx_header, tx_data, &tx_mailbox);
+	HAL_StatusTypeDef hal_err = HAL_CAN_AddTxMessage(dev->hcan, &tx_header, tx_data, &tx_mailbox);
+	if(hal_err != HAL_OK) {
+		return ISOW1044_ERR_CAN;
+	}
+
+	return ISOW1044_OK;
 }
 
 // Callback
